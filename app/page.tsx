@@ -44,6 +44,14 @@ const ACCOUNT_INFO: Record<string, { description: string; limit: string; taxAdva
   },
 };
 
+const ACCOUNT_LIMITS: Record<string, { annualLimit: number | null; lifetimeLimit: number | null; limitDescription: string | null }> = {
+  TFSA:    { annualLimit: 7000,  lifetimeLimit: null,  limitDescription: "$7,000/year" },
+  RRSP:    { annualLimit: 31560, lifetimeLimit: null,  limitDescription: "$31,560/year" },
+  FHSA:    { annualLimit: 8000,  lifetimeLimit: 40000, limitDescription: "$8,000/year ($40,000 lifetime)" },
+  RESP:    { annualLimit: null,  lifetimeLimit: 50000, limitDescription: "$50,000 lifetime" },
+  General: { annualLimit: null,  lifetimeLimit: null,  limitDescription: null },
+};
+
 function getCompoundFrequencyPerYear(frequency: CompoundFrequency): number {
   switch (frequency) {
     case "Annually":      return 1;
@@ -250,6 +258,41 @@ export default function Home() {
     return scenarios;
   }, [initialInvestment, monthlyContribution, lengthOfTime, annualReturn, compoundFrequency]);
 
+  const accountWarning = useMemo(() => {
+    if (!accountType || accountType === "General") return null;
+
+    const initial = parseFloat(initialInvestment) || 0;
+    const monthly = parseFloat(monthlyContribution) || 0;
+    const annual = monthly * 12;
+    const limits = ACCOUNT_LIMITS[accountType];
+    if (!limits) return null;
+
+    if (accountType === "RESP") {
+      if (initial > 50_000) {
+        return `Your initial investment of ${formatCurrency(initial)} exceeds the RESP lifetime limit of $50,000. Consider reducing your initial investment to $50,000 or less.`;
+      }
+      return null;
+    }
+
+    if (accountType === "FHSA") {
+      if (annual > 8_000) {
+        const maxMonthly = Math.floor(8_000 / 12);
+        return `Your monthly contributions of ${formatCurrency(monthly)}/month (${formatCurrency(annual)}/year) exceed the FHSA annual limit of $8,000/year. Consider reducing your monthly contribution to ${formatCurrency(maxMonthly)}/month or less.`;
+      }
+      if (initial > 40_000) {
+        return `Your initial investment of ${formatCurrency(initial)} exceeds the FHSA lifetime limit of $40,000. Consider reducing your initial investment to $40,000 or less.`;
+      }
+      return null;
+    }
+
+    if (limits.annualLimit !== null && annual > limits.annualLimit) {
+      const maxMonthly = Math.floor(limits.annualLimit / 12);
+      return `Your monthly contributions of ${formatCurrency(monthly)}/month (${formatCurrency(annual)}/year) exceed the ${accountType} annual limit of ${formatCurrency(limits.annualLimit)}/year. Consider reducing your monthly contribution to ${formatCurrency(maxMonthly)}/month or less.`;
+    }
+
+    return null;
+  }, [initialInvestment, monthlyContribution, accountType]);
+
   const inputClass =
     "w-full rounded-lg border border-zinc-700 bg-[#0a0a0a] py-3 text-zinc-50 placeholder-zinc-500 transition-colors focus:border-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500/50";
   const labelClass = "block text-sm font-medium mb-2 text-zinc-300";
@@ -406,6 +449,13 @@ export default function Home() {
                   <span className="font-medium">Tax Advantage:</span>{" "}
                   {ACCOUNT_INFO[accountType].taxAdvantage}
                 </p>
+              </div>
+            )}
+
+            {/* Account Contribution Warning */}
+            {accountWarning && (
+              <div className="mt-3 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                <p className="text-sm text-yellow-400">⚠️ {accountWarning}</p>
               </div>
             )}
           </form>
