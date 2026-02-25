@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import MoneyDisplay from "./components/MoneyDisplay";
 import {
   AreaChart,
   Area,
@@ -419,7 +420,7 @@ export default function Home() {
                     Projected Balance
                   </p>
                   <p className={balanceFontSize(results.totalBalance)}>
-                    {formatCurrency(results.totalBalance)}
+                    <MoneyDisplay value={results.totalBalance} />
                   </p>
                 </div>
 
@@ -428,13 +429,13 @@ export default function Home() {
                   <div>
                     <p className="mb-1 text-sm text-zinc-400">Total Amount Contributed</p>
                     <p className="text-2xl font-semibold text-zinc-50">
-                      {formatCurrency(results.totalContributed)}
+                      <MoneyDisplay value={results.totalContributed} />
                     </p>
                   </div>
                   <div>
                     <p className="mb-1 text-sm text-zinc-400">Total Interest Earned</p>
                     <p className="text-2xl font-semibold text-zinc-50">
-                      {formatCurrency(results.totalInterest)}
+                      <MoneyDisplay value={results.totalInterest} />
                     </p>
                   </div>
                 </div>
@@ -539,7 +540,7 @@ export default function Home() {
                       <p className="text-xs text-zinc-400">Final Balance</p>
                     </div>
                     <p className={`${cardNumberFontSize(scenario.totalBalance)} text-zinc-50`}>
-                      {formatCurrency(scenario.totalBalance)}
+                      <MoneyDisplay value={scenario.totalBalance} />
                     </p>
 
                     <hr className="my-4 border-zinc-800" />
@@ -548,7 +549,7 @@ export default function Home() {
                       <>
                         <p className="text-xs text-zinc-400">Lost Returns</p>
                         <p className={`mt-1 ${cardNumberFontSize(scenario.missedAmount)} text-red-400`}>
-                          {formatCurrency(scenario.missedAmount)}
+                          <MoneyDisplay value={scenario.missedAmount} />
                         </p>
                       </>
                     )}
