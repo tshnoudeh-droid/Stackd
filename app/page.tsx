@@ -218,32 +218,42 @@ export default function Home() {
   const [annualReturn, setAnnualReturn] = useState<string>("");
   const [compoundFrequency, setCompoundFrequency] = useState<CompoundFrequency>("Monthly");
   const [accountType, setAccountType] = useState<AccountType>("");
+  const [tfsaAnnualContribution, setTfsaAnnualContribution] = useState<string>("");
+  const [tfsaContributionYears, setTfsaContributionYears] = useState<string>("");
+
+  // When TFSA is selected, convert annual contribution to monthly equivalent
+  const effectiveMonthly = useMemo(() => {
+    if (accountType === "TFSA") {
+      return (parseFloat(tfsaAnnualContribution) || 0) / 12;
+    }
+    return parseFloat(monthlyContribution) || 0;
+  }, [accountType, tfsaAnnualContribution, monthlyContribution]);
 
   const results = useMemo(() => {
     const initial = parseFloat(initialInvestment) || 0;
-    const monthly = parseFloat(monthlyContribution) || 0;
+    const monthly = effectiveMonthly;
     const years = parseFloat(lengthOfTime) || 0;
     const returnRate = parseFloat(annualReturn) || 0;
 
     if (!isValidInputs(initial, monthly, years, returnRate)) return null;
 
     return calculateCompoundInterest(initial, monthly, returnRate, years, compoundFrequency);
-  }, [initialInvestment, monthlyContribution, lengthOfTime, annualReturn, compoundFrequency]);
+  }, [initialInvestment, effectiveMonthly, lengthOfTime, annualReturn, compoundFrequency]);
 
   const chartData = useMemo(() => {
     const initial = parseFloat(initialInvestment) || 0;
-    const monthly = parseFloat(monthlyContribution) || 0;
+    const monthly = effectiveMonthly;
     const years = parseFloat(lengthOfTime) || 0;
     const returnRate = parseFloat(annualReturn) || 0;
 
     if (!isValidInputs(initial, monthly, years, returnRate)) return null;
 
     return calculateYearlyData(initial, monthly, returnRate, years, compoundFrequency);
-  }, [initialInvestment, monthlyContribution, lengthOfTime, annualReturn, compoundFrequency]);
+  }, [initialInvestment, effectiveMonthly, lengthOfTime, annualReturn, compoundFrequency]);
 
   const comparisonScenarios = useMemo(() => {
     const initial = parseFloat(initialInvestment) || 0;
-    const monthly = parseFloat(monthlyContribution) || 0;
+    const monthly = effectiveMonthly;
     const years = parseFloat(lengthOfTime) || 0;
     const returnRate = parseFloat(annualReturn) || 0;
 
@@ -285,16 +295,22 @@ export default function Home() {
     }
 
     return scenarios;
-  }, [initialInvestment, monthlyContribution, lengthOfTime, annualReturn, compoundFrequency]);
+  }, [initialInvestment, effectiveMonthly, lengthOfTime, annualReturn, compoundFrequency]);
 
   const accountWarning = useMemo(() => {
     if (!accountType || accountType === "General") return null;
 
     const initial = parseFloat(initialInvestment) || 0;
-    const monthly = parseFloat(monthlyContribution) || 0;
-    const annual = monthly * 12;
     const limits = ACCOUNT_LIMITS[accountType];
     if (!limits) return null;
+
+    if (accountType === "TFSA") {
+      const annual = parseFloat(tfsaAnnualContribution) || 0;
+      if (annual > 7_000) {
+        return `You've exceeded the $7,000 annual TFSA limit. Maximum annual contribution is $7,000.`;
+      }
+      return null;
+    }
 
     if (accountType === "RESP") {
       if (initial > 50_000) {
@@ -302,6 +318,9 @@ export default function Home() {
       }
       return null;
     }
+
+    const monthly = parseFloat(monthlyContribution) || 0;
+    const annual = monthly * 12;
 
     if (accountType === "FHSA") {
       if (annual > 8_000) {
@@ -320,7 +339,16 @@ export default function Home() {
     }
 
     return null;
-  }, [initialInvestment, monthlyContribution, accountType]);
+  }, [initialInvestment, monthlyContribution, accountType, tfsaAnnualContribution]);
+
+  const tfsaConfirmation = useMemo(() => {
+    if (accountType !== "TFSA") return null;
+    const annual = parseFloat(tfsaAnnualContribution) || 0;
+    if (annual > 0 && annual <= 7_000) {
+      return `✓ Your annual contribution of ${formatCurrency(annual)} is within the TFSA limit.`;
+    }
+    return null;
+  }, [accountType, tfsaAnnualContribution]);
 
   const inputClass =
     "w-full rounded-lg border border-zinc-700 bg-[#0a0a0a] py-3 text-zinc-50 placeholder-zinc-500 transition-colors focus:border-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500/50";
@@ -371,25 +399,84 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Monthly Contribution */}
-            <div>
-              <label htmlFor="monthly-contribution" className={labelClass}>
-                Monthly Contribution
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
-                <input
-                  type="number"
-                  id="monthly-contribution"
-                  value={monthlyContribution}
-                  onChange={(e) => setMonthlyContribution(e.target.value)}
-                  placeholder="0"
-                  min="0"
-                  step="0.01"
-                  className={`${inputClass} pl-8 pr-4`}
-                />
+            {/* Monthly Contribution — hidden when TFSA is selected */}
+            {accountType !== "TFSA" && (
+              <div>
+                <label htmlFor="monthly-contribution" className={labelClass}>
+                  Monthly Contribution
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                  <input
+                    type="number"
+                    id="monthly-contribution"
+                    value={monthlyContribution}
+                    onChange={(e) => setMonthlyContribution(e.target.value)}
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                    className={`${inputClass} pl-8 pr-4`}
+                  />
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* TFSA-specific contribution fields */}
+            {accountType === "TFSA" && (
+              <>
+                <div>
+                  <label htmlFor="tfsa-annual-contribution" className={labelClass}>
+                    Annual Contribution
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                    <input
+                      type="number"
+                      id="tfsa-annual-contribution"
+                      value={tfsaAnnualContribution}
+                      onChange={(e) => setTfsaAnnualContribution(e.target.value)}
+                      placeholder="0"
+                      min="0"
+                      max="7000"
+                      step="1"
+                      className={`${inputClass} pl-8 pr-4`}
+                    />
+                  </div>
+                  <p className="mt-1.5 text-xs text-zinc-500">
+                    TFSA annual limit is $7,000/year. Your remaining room depends on your age and contribution history.
+                  </p>
+                </div>
+
+                <div>
+                  <label htmlFor="tfsa-contribution-years" className={labelClass}>
+                    Years of Contribution History
+                  </label>
+                  <input
+                    type="number"
+                    id="tfsa-contribution-years"
+                    value={tfsaContributionYears}
+                    onChange={(e) => setTfsaContributionYears(e.target.value)}
+                    placeholder="0"
+                    min="0"
+                    max="30"
+                    step="1"
+                    className={`${inputClass} px-4`}
+                  />
+                  <p className="mt-1.5 text-xs text-zinc-500">
+                    How many years have you been eligible for a TFSA? (18+ years old). Each year adds $7,000 of room.
+                  </p>
+                </div>
+
+                {parseFloat(tfsaContributionYears) > 0 && (
+                  <p className="text-sm text-zinc-300">
+                    Your estimated total TFSA room:{" "}
+                    <span className="font-semibold text-zinc-50">
+                      {formatCurrency((parseFloat(tfsaContributionYears) || 0) * 7_000)}
+                    </span>
+                  </p>
+                )}
+              </>
+            )}
 
             {/* Length of Time */}
             <div>
@@ -494,6 +581,13 @@ export default function Home() {
             {accountWarning && (
               <div className="mt-3 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
                 <p className="text-sm text-yellow-400">⚠️ {accountWarning}</p>
+              </div>
+            )}
+
+            {/* TFSA contribution confirmation */}
+            {tfsaConfirmation && (
+              <div className="mt-3 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+                <p className="text-sm text-green-400">{tfsaConfirmation}</p>
               </div>
             )}
           </form>
