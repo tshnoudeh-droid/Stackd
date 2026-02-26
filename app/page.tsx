@@ -601,37 +601,51 @@ export default function Home() {
                 See how much starting earlier can impact your final balance.
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {comparisonScenarios.map((scenario) => (
-                  <div
-                    key={scenario.label}
-                    className="min-w-0 overflow-hidden rounded-xl border border-zinc-800 bg-[#111111] p-5"
-                  >
-                    <p className="text-sm font-semibold text-zinc-50">{scenario.label}</p>
-                    <p className="mt-1 text-xs text-zinc-500">
-                      Investing for {scenario.years}{" "}
-                      {scenario.years === 1 ? "year" : "years"}
-                    </p>
+                {comparisonScenarios.map((scenario) => {
+                  const currentYear = new Date().getFullYear();
+                  const subtitle =
+                    scenario.label === "Start Now"
+                      ? "If you start investing today"
+                      : scenario.label === "Wait 5 Years"
+                      ? `If you start investing in ${currentYear + 5}`
+                      : `If you start investing in ${currentYear + 10}`;
 
-                    <div className="mt-4 mb-1">
-                      <p className="text-xs text-zinc-400">Final Balance</p>
+                  return (
+                    <div
+                      key={scenario.label}
+                      className="min-w-0 overflow-hidden rounded-xl border border-zinc-800 bg-[#111111] p-5"
+                    >
+                      <p className="text-sm font-semibold text-zinc-50">{scenario.label}</p>
+                      <p className="mt-1 text-xs text-zinc-500">{subtitle}</p>
+
+                      <div className="mt-4 mb-1">
+                        <p className="text-xs text-zinc-400">You&apos;ll end up with</p>
+                      </div>
+                      <p className={`${cardNumberFontSize(scenario.totalBalance)} text-zinc-50`}>
+                        <MoneyDisplay value={scenario.totalBalance} />
+                      </p>
+
+                      <hr className="my-4 border-zinc-800" />
+
+                      {!scenario.highlight && scenario.missedAmount > 0 && (
+                        <>
+                          <p className="text-xs text-zinc-400">Lost Returns</p>
+                          <p className={`mt-1 ${cardNumberFontSize(scenario.missedAmount)} text-red-400`}>
+                            <MoneyDisplay value={scenario.missedAmount} />
+                          </p>
+                        </>
+                      )}
                     </div>
-                    <p className={`${cardNumberFontSize(scenario.totalBalance)} text-zinc-50`}>
-                      <MoneyDisplay value={scenario.totalBalance} />
-                    </p>
-
-                    <hr className="my-4 border-zinc-800" />
-
-                    {!scenario.highlight && (
-                      <>
-                        <p className="text-xs text-zinc-400">Lost Returns</p>
-                        <p className={`mt-1 ${cardNumberFontSize(scenario.missedAmount)} text-red-400`}>
-                          <MoneyDisplay value={scenario.missedAmount} />
-                        </p>
-                      </>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
+
+              {comparisonScenarios.length >= 3 && comparisonScenarios[2].missedAmount > 0 && (
+                <p className="text-sm text-zinc-400 mt-4 text-center">
+                  Starting today vs waiting 10 years could cost you{" "}
+                  <MoneyDisplay value={comparisonScenarios[2].missedAmount} /> in lost returns.
+                </p>
+              )}
             </div>
           )}
         </div>
