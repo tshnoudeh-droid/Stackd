@@ -220,14 +220,30 @@ export default function Home() {
   const [accountType, setAccountType] = useState<AccountType>("");
   const [tfsaAnnualContribution, setTfsaAnnualContribution] = useState<string>("");
   const [tfsaContributionYears, setTfsaContributionYears] = useState<string>("");
+  const [rrspAnnualIncome, setRrspAnnualIncome] = useState<string>("");
+  const [rrspAnnualContribution, setRrspAnnualContribution] = useState<string>("");
+  const [fhsaAnnualContribution, setFhsaAnnualContribution] = useState<string>("");
+  const [respAnnualContribution, setRespAnnualContribution] = useState<string>("");
 
-  // When TFSA is selected, convert annual contribution to monthly equivalent
+  // Convert account-specific annual contributions to a monthly equivalent for calculations
   const effectiveMonthly = useMemo(() => {
     if (accountType === "TFSA") {
       return (parseFloat(tfsaAnnualContribution) || 0) / 12;
     }
+    if (accountType === "RRSP") {
+      return (parseFloat(rrspAnnualContribution) || 0) / 12;
+    }
+    if (accountType === "FHSA") {
+      return (parseFloat(fhsaAnnualContribution) || 0) / 12;
+    }
+    if (accountType === "RESP") {
+      // Include the CESG grant (20% on first $2,500/year, max $500/year)
+      const annual = parseFloat(respAnnualContribution) || 0;
+      const cesg = Math.min(annual * 0.20, 500);
+      return (annual + cesg) / 12;
+    }
     return parseFloat(monthlyContribution) || 0;
-  }, [accountType, tfsaAnnualContribution, monthlyContribution]);
+  }, [accountType, tfsaAnnualContribution, rrspAnnualContribution, fhsaAnnualContribution, respAnnualContribution, monthlyContribution]);
 
   const results = useMemo(() => {
     const initial = parseFloat(initialInvestment) || 0;
@@ -301,8 +317,6 @@ export default function Home() {
     if (!accountType || accountType === "General") return null;
 
     const initial = parseFloat(initialInvestment) || 0;
-    const limits = ACCOUNT_LIMITS[accountType];
-    if (!limits) return null;
 
     if (accountType === "TFSA") {
       const annual = parseFloat(tfsaAnnualContribution) || 0;
@@ -312,43 +326,82 @@ export default function Home() {
       return null;
     }
 
-    if (accountType === "RESP") {
-      if (initial > 50_000) {
-        return `Your initial investment of ${formatCurrency(initial)} exceeds the RESP lifetime limit of $50,000. Consider reducing your initial investment to $50,000 or less.`;
+    if (accountType === "RRSP") {
+      const income = parseFloat(rrspAnnualIncome) || 0;
+      const annual = parseFloat(rrspAnnualContribution) || 0;
+      if (annual > 0 && income > 0) {
+        const limit = Math.min(income * 0.18, 31_560);
+        if (annual > limit) {
+          return `Your annual contribution of ${formatCurrency(annual)} exceeds your RRSP limit of ${formatCurrency(limit)}. Consider reducing your contribution.`;
+        }
       }
       return null;
     }
-
-    const monthly = parseFloat(monthlyContribution) || 0;
-    const annual = monthly * 12;
 
     if (accountType === "FHSA") {
+      const annual = parseFloat(fhsaAnnualContribution) || 0;
       if (annual > 8_000) {
-        const maxMonthly = Math.floor(8_000 / 12);
-        return `Your monthly contributions of ${formatCurrency(monthly)}/month (${formatCurrency(annual)}/year) exceed the FHSA annual limit of $8,000/year. Consider reducing your monthly contribution to ${formatCurrency(maxMonthly)}/month or less.`;
+        return `Your annual contribution of ${formatCurrency(annual)} exceeds the FHSA annual limit of $8,000.`;
       }
       if (initial > 40_000) {
-        return `Your initial investment of ${formatCurrency(initial)} exceeds the FHSA lifetime limit of $40,000. Consider reducing your initial investment to $40,000 or less.`;
+        return `Your initial investment of ${formatCurrency(initial)} exceeds the FHSA lifetime limit of $40,000.`;
+      }
+      const years = parseFloat(lengthOfTime) || 0;
+      if (annual > 0 && annual * years > 40_000) {
+        const yearsUntilLimit = Math.floor(40_000 / annual);
+        return `You'll hit the $40,000 FHSA lifetime limit in ${yearsUntilLimit} year${yearsUntilLimit !== 1 ? "s" : ""}. After that, no new contributions can be made.`;
       }
       return null;
     }
 
-    if (limits.annualLimit !== null && annual > limits.annualLimit) {
-      const maxMonthly = Math.floor(limits.annualLimit / 12);
-      return `Your monthly contributions of ${formatCurrency(monthly)}/month (${formatCurrency(annual)}/year) exceed the ${accountType} annual limit of ${formatCurrency(limits.annualLimit)}/year. Consider reducing your monthly contribution to ${formatCurrency(maxMonthly)}/month or less.`;
+    if (accountType === "RESP") {
+      const annual = parseFloat(respAnnualContribution) || 0;
+      const years = parseFloat(lengthOfTime) || 0;
+      if (annual > 0 && annual * years > 50_000) {
+        return `Your lifetime RESP contributions (${formatCurrency(annual * years)}) will exceed the $50,000 limit. Consider reducing your annual contribution.`;
+      }
+      if (initial > 50_000) {
+        return `Your initial investment of ${formatCurrency(initial)} exceeds the RESP lifetime limit of $50,000.`;
+      }
+      return null;
     }
 
     return null;
-  }, [initialInvestment, monthlyContribution, accountType, tfsaAnnualContribution]);
+  }, [initialInvestment, accountType, tfsaAnnualContribution, rrspAnnualIncome, rrspAnnualContribution, fhsaAnnualContribution, respAnnualContribution, lengthOfTime]);
 
-  const tfsaConfirmation = useMemo(() => {
-    if (accountType !== "TFSA") return null;
-    const annual = parseFloat(tfsaAnnualContribution) || 0;
-    if (annual > 0 && annual <= 7_000) {
-      return `✓ Your annual contribution of ${formatCurrency(annual)} is within the TFSA limit.`;
+  const accountConfirmation = useMemo(() => {
+    if (accountType === "TFSA") {
+      const annual = parseFloat(tfsaAnnualContribution) || 0;
+      if (annual > 0 && annual <= 7_000) {
+        return `✓ Your annual contribution of ${formatCurrency(annual)} is within the TFSA limit.`;
+      }
+    }
+    if (accountType === "RRSP") {
+      const income = parseFloat(rrspAnnualIncome) || 0;
+      const annual = parseFloat(rrspAnnualContribution) || 0;
+      if (annual > 0 && income > 0) {
+        const limit = Math.min(income * 0.18, 31_560);
+        if (annual <= limit) {
+          return `✓ Your annual contribution of ${formatCurrency(annual)} is within your RRSP limit of ${formatCurrency(limit)}.`;
+        }
+      }
+    }
+    if (accountType === "FHSA") {
+      const annual = parseFloat(fhsaAnnualContribution) || 0;
+      const years = parseFloat(lengthOfTime) || 0;
+      if (annual > 0 && annual <= 8_000 && annual * years <= 40_000) {
+        return `✓ Your annual contribution of ${formatCurrency(annual)} is within the FHSA limits.`;
+      }
+    }
+    if (accountType === "RESP") {
+      const annual = parseFloat(respAnnualContribution) || 0;
+      const years = parseFloat(lengthOfTime) || 0;
+      if (annual > 0 && annual * years <= 50_000) {
+        return `✓ Your annual contribution of ${formatCurrency(annual)}/year is within the RESP lifetime limit.`;
+      }
     }
     return null;
-  }, [accountType, tfsaAnnualContribution]);
+  }, [accountType, tfsaAnnualContribution, rrspAnnualIncome, rrspAnnualContribution, fhsaAnnualContribution, respAnnualContribution, lengthOfTime]);
 
   const inputClass =
     "w-full rounded-lg border border-zinc-700 bg-[#0a0a0a] py-3 text-zinc-50 placeholder-zinc-500 transition-colors focus:border-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500/50";
@@ -399,8 +452,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Monthly Contribution — hidden when TFSA is selected */}
-            {accountType !== "TFSA" && (
+            {/* Monthly Contribution — hidden for all registered account types */}
+            {!["TFSA", "RRSP", "FHSA", "RESP"].includes(accountType) && (
               <div>
                 <label htmlFor="monthly-contribution" className={labelClass}>
                   Monthly Contribution
@@ -473,6 +526,145 @@ export default function Home() {
                     <span className="font-semibold text-zinc-50">
                       {formatCurrency((parseFloat(tfsaContributionYears) || 0) * 7_000)}
                     </span>
+                  </p>
+                )}
+              </>
+            )}
+
+            {/* RRSP-specific contribution fields */}
+            {accountType === "RRSP" && (
+              <>
+                <div>
+                  <label htmlFor="rrsp-annual-income" className={labelClass}>
+                    Your Annual Income
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                    <input
+                      type="number"
+                      id="rrsp-annual-income"
+                      value={rrspAnnualIncome}
+                      onChange={(e) => setRrspAnnualIncome(e.target.value)}
+                      placeholder="0"
+                      min="0"
+                      step="1"
+                      className={`${inputClass} pl-8 pr-4`}
+                    />
+                  </div>
+                  <p className="mt-1.5 text-xs text-zinc-500">
+                    RRSP contribution limit is 18% of your previous year&apos;s income, up to $31,560/year.
+                  </p>
+                </div>
+
+                {(parseFloat(rrspAnnualIncome) || 0) > 0 && (
+                  <p className="text-sm text-zinc-300">
+                    Your RRSP annual limit:{" "}
+                    <span className="font-semibold text-zinc-50">
+                      {formatCurrency(Math.min((parseFloat(rrspAnnualIncome) || 0) * 0.18, 31_560))}
+                    </span>
+                  </p>
+                )}
+
+                <div>
+                  <label htmlFor="rrsp-annual-contribution" className={labelClass}>
+                    Annual Contribution
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                    <input
+                      type="number"
+                      id="rrsp-annual-contribution"
+                      value={rrspAnnualContribution}
+                      onChange={(e) => setRrspAnnualContribution(e.target.value)}
+                      placeholder="0"
+                      min="0"
+                      step="1"
+                      className={`${inputClass} pl-8 pr-4`}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* FHSA-specific contribution fields */}
+            {accountType === "FHSA" && (
+              <>
+                <div>
+                  <label htmlFor="fhsa-annual-contribution" className={labelClass}>
+                    Annual Contribution
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                    <input
+                      type="number"
+                      id="fhsa-annual-contribution"
+                      value={fhsaAnnualContribution}
+                      onChange={(e) => setFhsaAnnualContribution(e.target.value)}
+                      placeholder="0"
+                      min="0"
+                      max="8000"
+                      step="1"
+                      className={`${inputClass} pl-8 pr-4`}
+                    />
+                  </div>
+                  <p className="mt-1.5 text-xs text-zinc-500">
+                    FHSA annual limit is $8,000/year with a $40,000 lifetime maximum. Only available to first-time home buyers.
+                  </p>
+                </div>
+
+                {(parseFloat(fhsaAnnualContribution) || 0) > 0 && (parseFloat(lengthOfTime) || 0) > 0 && (
+                  <p className="text-sm text-zinc-300">
+                    Lifetime contributions so far:{" "}
+                    <span className="font-semibold text-zinc-50">
+                      {formatCurrency((parseFloat(fhsaAnnualContribution) || 0) * (parseFloat(lengthOfTime) || 0))}
+                    </span>{" "}
+                    of $40,000
+                  </p>
+                )}
+              </>
+            )}
+
+            {/* RESP-specific contribution fields */}
+            {accountType === "RESP" && (
+              <>
+                <div>
+                  <label htmlFor="resp-annual-contribution" className={labelClass}>
+                    Annual Contribution
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                    <input
+                      type="number"
+                      id="resp-annual-contribution"
+                      value={respAnnualContribution}
+                      onChange={(e) => setRespAnnualContribution(e.target.value)}
+                      placeholder="0"
+                      min="0"
+                      step="1"
+                      className={`${inputClass} pl-8 pr-4`}
+                    />
+                  </div>
+                  <p className="mt-1.5 text-xs text-zinc-500">
+                    RESP lifetime limit is $50,000 per child. The government adds a 20% CESG grant on the first $2,500/year (up to $500/year in free money).
+                  </p>
+                </div>
+
+                {(parseFloat(respAnnualContribution) || 0) > 0 && (
+                  <p className="text-sm text-zinc-300">
+                    Annual government CESG grant:{" "}
+                    <span className="font-semibold text-green-400">
+                      {formatCurrency(Math.min((parseFloat(respAnnualContribution) || 0) * 0.20, 500))}
+                    </span>
+                  </p>
+                )}
+
+                {(parseFloat(respAnnualContribution) || 0) > 0 && (parseFloat(lengthOfTime) || 0) > 0 && (
+                  <p className="text-sm text-zinc-300">
+                    Lifetime contributions:{" "}
+                    <span className="font-semibold text-zinc-50">
+                      {formatCurrency((parseFloat(respAnnualContribution) || 0) * (parseFloat(lengthOfTime) || 0))}
+                    </span>{" "}
+                    of $50,000
                   </p>
                 )}
               </>
@@ -584,10 +776,10 @@ export default function Home() {
               </div>
             )}
 
-            {/* TFSA contribution confirmation */}
-            {tfsaConfirmation && (
+            {/* Account contribution confirmation */}
+            {accountConfirmation && (
               <div className="mt-3 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <p className="text-sm text-green-400">{tfsaConfirmation}</p>
+                <p className="text-sm text-green-400">{accountConfirmation}</p>
               </div>
             )}
           </form>
