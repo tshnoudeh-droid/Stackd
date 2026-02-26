@@ -579,12 +579,12 @@ export default function Home() {
                     onChange={(e) => setTfsaContributionYears(e.target.value)}
                     placeholder="0"
                     min="0"
-                    max="30"
+                    max={new Date().getFullYear() - 2009}
                     step="1"
                     className={`${inputClass} px-4`}
                   />
                   <p className="mt-1.5 text-xs text-zinc-500">
-                    How many years have you been eligible for a TFSA? (18+ years old). Each year adds $7,000 of room.
+                    How many years have you been eligible for a TFSA? (18+ years old). Each year adds $7,000 of room. Max {new Date().getFullYear() - 2009} years — the TFSA has existed since 2009.
                   </p>
                 </div>
 
@@ -592,7 +592,7 @@ export default function Home() {
                   <p className="text-sm text-zinc-300">
                     Your estimated total TFSA room:{" "}
                     <span className="font-semibold text-zinc-50">
-                      {formatCurrency((parseFloat(tfsaContributionYears) || 0) * 7_000)}
+                      {formatCurrency(Math.min(parseFloat(tfsaContributionYears) || 0, new Date().getFullYear() - 2009) * 7_000)}
                     </span>
                   </p>
                 )}
@@ -748,12 +748,37 @@ export default function Home() {
                 id="length-of-time"
                 value={lengthOfTime}
                 onChange={(e) => setLengthOfTime(e.target.value)}
-                placeholder="1–100"
+                placeholder={`1–${
+                  accountType === "RRSP" ? new Date().getFullYear() - 1957
+                  : accountType === "FHSA" ? new Date().getFullYear() - 2023
+                  : accountType === "RESP" ? new Date().getFullYear() - 1974
+                  : 100
+                }`}
                 min="1"
-                max="100"
+                max={
+                  accountType === "RRSP" ? new Date().getFullYear() - 1957
+                  : accountType === "FHSA" ? new Date().getFullYear() - 2023
+                  : accountType === "RESP" ? new Date().getFullYear() - 1974
+                  : 100
+                }
                 step="1"
                 className={`${inputClass} px-4`}
               />
+              {accountType === "RRSP" && (
+                <p className="mt-1.5 text-xs text-zinc-500">
+                  Max {new Date().getFullYear() - 1957} years — the RRSP has existed since 1957.
+                </p>
+              )}
+              {accountType === "FHSA" && (
+                <p className="mt-1.5 text-xs text-zinc-500">
+                  Max {new Date().getFullYear() - 2023} years — the FHSA has only existed since 2023.
+                </p>
+              )}
+              {accountType === "RESP" && (
+                <p className="mt-1.5 text-xs text-zinc-500">
+                  Max {new Date().getFullYear() - 1974} years — the RESP has existed since 1974.
+                </p>
+              )}
             </div>
 
             {/* Estimated Annual Return */}
