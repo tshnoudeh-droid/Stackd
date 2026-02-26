@@ -189,26 +189,25 @@ function cardNumberFontSize(amount: number): string {
   return "text-2xl font-bold";
 }
 
-const ChartLabel = ({ x, y, value, showLabel }: { x?: number; y?: number; value?: number; showLabel?: boolean }) => {
-  if (!showLabel || value === undefined || value === null) return null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const CustomDotLabel = (props: any) => {
+  const { x, y, value, index, data } = props;
+  const point = data?.[index];
+  if (!point?.showLabel) return null;
 
   const formatted = value >= 1e12 ? `$${(value / 1e12).toFixed(1)}T`
     : value >= 1e9  ? `$${(value / 1e9).toFixed(1)}B`
     : value >= 1e6  ? `$${(value / 1e6).toFixed(1)}M`
     : value >= 1e3  ? `$${(value / 1e3).toFixed(0)}K`
-    : `$${value.toFixed(0)}`;
+    : `$${Math.round(value)}`;
 
   return (
-    <text
-      x={x}
-      y={(y ?? 0) - 8}
-      fill="#22c55e"
-      fontSize={11}
-      textAnchor="middle"
-      fontWeight="500"
-    >
-      {formatted}
-    </text>
+    <g>
+      <circle cx={x} cy={y} r={4} fill="#22c55e" stroke="#0a0a0a" strokeWidth={2} />
+      <text x={x} y={y - 12} textAnchor="middle" fill="#22c55e" fontSize={11} fontWeight="600">
+        {formatted}
+      </text>
+    </g>
   );
 };
 
@@ -592,7 +591,7 @@ export default function Home() {
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#colorBalance)"
-                      label={<ChartLabel />}
+                      label={(props) => <CustomDotLabel {...props} data={chartData} />}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
