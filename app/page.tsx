@@ -135,8 +135,13 @@ function calculateYearlyData(
   const r = annualReturn / 100;
   const n = getCompoundFrequencyPerYear(frequency);
   const PMT = getContributionPerPeriod(monthlyContribution, frequency);
-  const midpoint = Math.round(years / 2);
-  const labelYears = new Set([0, midpoint, years]);
+  const labelYears = new Set([
+    0,
+    Math.round(years * 0.25),
+    Math.round(years * 0.5),
+    Math.round(years * 0.75),
+    years,
+  ]);
 
   for (let t = 0; t <= years; t++) {
     const compoundPrincipal = initialInvestment * Math.pow(1 + r / n, n * t);
@@ -454,14 +459,16 @@ export default function Home() {
                 <option value="RRSP">RRSP</option>
                 <option value="FHSA">FHSA</option>
                 <option value="RESP">RESP</option>
-                <option value="General">General</option>
+                <option value="General">Non-Registered Account</option>
               </select>
             </div>
 
             {/* Account Type Info Box */}
             {accountType && ACCOUNT_INFO[accountType] && (
               <div className="rounded-lg border border-green-500/30 bg-[#0a0a0a] p-4">
-                <h3 className="mb-2 text-lg font-semibold text-green-400">{accountType}</h3>
+                <h3 className="mb-2 text-lg font-semibold text-green-400">
+                  {accountType === "General" ? "Non-Registered Account" : accountType}
+                </h3>
                 <p className="mb-2 text-sm text-zinc-300">
                   <span className="font-medium">What it is:</span>{" "}
                   {ACCOUNT_INFO[accountType].description}
@@ -601,22 +608,12 @@ export default function Home() {
                 Time in the market is your biggest advantage. See what waiting costs you.
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {comparisonScenarios.map((scenario) => {
-                  const currentYear = new Date().getFullYear();
-                  const subtitle =
-                    scenario.label === "Start Now"
-                      ? "If you start investing today"
-                      : scenario.label === "Wait 5 Years"
-                      ? `If you start investing in ${currentYear + 5}`
-                      : `If you start investing in ${currentYear + 10}`;
-
-                  return (
+                {comparisonScenarios.map((scenario) => (
                     <div
                       key={scenario.label}
                       className="min-w-0 overflow-hidden rounded-xl border border-zinc-800 bg-[#111111] p-5"
                     >
                       <p className="text-sm font-semibold text-zinc-50">{scenario.label}</p>
-                      <p className="mt-1 text-xs text-zinc-500">{subtitle}</p>
 
                       <div className="mt-4 mb-1">
                         <p className="text-xs text-zinc-500">You&apos;ll end up with</p>
@@ -636,8 +633,7 @@ export default function Home() {
                         </>
                       )}
                     </div>
-                  );
-                })}
+                ))}
               </div>
 
               {comparisonScenarios.length >= 3 && comparisonScenarios[2].missedAmount > 0 && (
