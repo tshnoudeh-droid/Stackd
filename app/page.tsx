@@ -329,7 +329,7 @@ export default function Home() {
         {/* Header */}
         <h1 className="text-center text-4xl font-semibold sm:text-left">Stackd</h1>
         <p className="mt-2 text-center text-sm text-zinc-500 sm:text-left">
-          Built for young Canadian investors.
+          See what your money can become.
         </p>
 
         {/* Calculator card */}
@@ -337,9 +337,9 @@ export default function Home() {
           {/* Faint green top accent line */}
           <div className="absolute inset-x-0 top-0 h-px bg-green-500/20" />
 
-          <h2 className="mb-6 text-2xl font-semibold">Calculator</h2>
+          <h2 className="mb-6 text-xl font-semibold">Calculator</h2>
 
-          <form className="space-y-6">
+          <form className="space-y-5">
             {/* Initial Investment */}
             <div>
               <label htmlFor="initial-investment" className={labelClass}>
@@ -491,7 +491,7 @@ export default function Home() {
               <div className="space-y-6">
                 {/* Projected Balance */}
                 <div className="rounded-lg bg-green-500/5 p-4">
-                  <p className="mb-2 text-xs uppercase tracking-widest text-zinc-400">
+                  <p className="mb-2 text-xs uppercase tracking-widest text-zinc-500">
                     Projected Balance
                   </p>
                   <p className={balanceFontSize(results.totalBalance)}>
@@ -502,13 +502,13 @@ export default function Home() {
                 {/* Contributed + Interest */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
-                    <p className="mb-1 text-sm text-zinc-400">Total Amount Contributed</p>
+                    <p className="mb-1 text-xs text-zinc-500">Total Amount Contributed</p>
                     <p className="text-2xl font-semibold text-zinc-50">
                       <MoneyDisplay value={results.totalContributed} />
                     </p>
                   </div>
                   <div>
-                    <p className="mb-1 text-sm text-zinc-400">Total Interest Earned</p>
+                    <p className="mb-1 text-xs text-zinc-500">Total Interest Earned</p>
                     <p className="text-2xl font-semibold text-zinc-50">
                       <MoneyDisplay value={results.totalInterest} />
                     </p>
@@ -526,7 +526,7 @@ export default function Home() {
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
                     data={chartData}
-                    margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                    margin={{ top: 16, right: 20, left: 0, bottom: 0 }}
                   >
                     <defs>
                       <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
@@ -597,8 +597,8 @@ export default function Home() {
           {comparisonScenarios && comparisonScenarios.length > 0 && (
             <div className="mt-8 border-t border-zinc-800 pt-8">
               <h3 className="mb-2 text-xl font-semibold">What If You Waited?</h3>
-              <p className="mb-6 text-sm text-zinc-400">
-                See how much starting earlier can impact your final balance.
+              <p className="mb-6 text-xs text-zinc-500">
+                Time in the market is your biggest advantage. See what waiting costs you.
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {comparisonScenarios.map((scenario) => {
@@ -619,7 +619,7 @@ export default function Home() {
                       <p className="mt-1 text-xs text-zinc-500">{subtitle}</p>
 
                       <div className="mt-4 mb-1">
-                        <p className="text-xs text-zinc-400">You&apos;ll end up with</p>
+                        <p className="text-xs text-zinc-500">You&apos;ll end up with</p>
                       </div>
                       <p className={`${cardNumberFontSize(scenario.totalBalance)} text-zinc-50`}>
                         <MoneyDisplay value={scenario.totalBalance} />
@@ -629,7 +629,7 @@ export default function Home() {
 
                       {!scenario.highlight && scenario.missedAmount > 0 && (
                         <>
-                          <p className="text-xs text-zinc-400">Lost Returns</p>
+                          <p className="text-xs text-zinc-500">Lost Returns</p>
                           <p className={`mt-1 ${cardNumberFontSize(scenario.missedAmount)} text-red-400`}>
                             <MoneyDisplay value={scenario.missedAmount} />
                           </p>
