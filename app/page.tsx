@@ -178,9 +178,9 @@ function isValidInputs(
 }
 
 function balanceFontSize(amount: number): string {
-  if (amount >= 100_000_000) return "text-2xl font-bold text-green-400";
-  if (amount >= 1_000_000)   return "text-3xl font-bold text-green-400";
-  return "text-4xl font-bold text-green-400 md:text-5xl";
+  if (amount >= 100_000_000) return "text-2xl font-bold text-violet-400";
+  if (amount >= 1_000_000)   return "text-3xl font-bold text-violet-400";
+  return "text-4xl font-bold text-violet-400 md:text-5xl";
 }
 
 function cardNumberFontSize(amount: number): string {
@@ -203,8 +203,8 @@ const CustomDotLabel = (props: any) => {
 
   return (
     <g>
-      <circle cx={x} cy={y} r={4} fill="#22c55e" stroke="#0a0a0a" strokeWidth={2} />
-      <text x={x} y={y - 12} textAnchor="middle" fill="#22c55e" fontSize={11} fontWeight="600">
+      <circle cx={x} cy={y} r={4} fill="#8b5cf6" stroke="#09090f" strokeWidth={2} />
+      <text x={x} y={y - 12} textAnchor="middle" fill="#8b5cf6" fontSize={11} fontWeight="600">
         {formatted}
       </text>
     </g>
@@ -404,11 +404,11 @@ export default function Home() {
   }, [accountType, tfsaAnnualContribution, rrspAnnualIncome, rrspAnnualContribution, fhsaAnnualContribution, respAnnualContribution, lengthOfTime]);
 
   const inputClass =
-    "w-full rounded-lg border border-zinc-700 bg-[#0a0a0a] py-3 text-zinc-50 placeholder-zinc-500 transition-colors focus:border-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500/50";
+    "w-full rounded-lg border border-zinc-700 bg-[#09090f] py-3 text-zinc-50 placeholder-zinc-500 transition-colors focus:border-violet-500/50 focus:outline-none focus:ring-2 focus:ring-violet-500/50";
   const labelClass = "block text-sm font-medium mb-2 text-zinc-300";
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-zinc-50">
+    <div className="min-h-screen bg-[#09090f] text-zinc-50">
       <div className="container mx-auto max-w-2xl px-4 pt-14 pb-0 sm:px-6 lg:px-8">
 
         {/* Header */}
@@ -418,16 +418,16 @@ export default function Home() {
         </p>
         {accountType && (
           <div className="mt-2 text-center sm:text-left">
-            <span className="inline-block px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-xs text-green-400 font-medium">
+            <span className="inline-block px-3 py-1 bg-violet-500/10 border border-violet-500/20 rounded-full text-xs text-violet-400 font-medium">
               {accountType === "General" ? "Non-Registered Account" : accountType} Selected
             </span>
           </div>
         )}
 
         {/* Calculator card */}
-        <div className="relative mt-10 overflow-hidden rounded-lg border border-zinc-800 bg-[#1a1a1a] p-6 md:p-8">
+        <div className="relative mt-10 overflow-hidden rounded-lg border border-zinc-800 bg-[#131326] p-6 md:p-8">
           {/* Faint green top accent line */}
-          <div className="absolute inset-x-0 top-0 h-px bg-green-500/20" />
+          <div className="absolute inset-x-0 top-0 h-px bg-violet-500/20" />
 
           <h2 className="mb-6 text-xl font-semibold">Calculator</h2>
 
@@ -454,8 +454,8 @@ export default function Home() {
 
             {/* Account Type Info Box */}
             {accountType && ACCOUNT_INFO[accountType] && (
-              <div className="rounded-lg border border-green-500/30 bg-[#0a0a0a] p-4">
-                <h3 className="mb-2 text-lg font-semibold text-green-400">
+              <div className="rounded-lg border border-violet-500/30 bg-[#09090f] p-4">
+                <h3 className="mb-2 text-lg font-semibold text-violet-400">
                   {accountType === "General" ? "Non-Registered Account" : accountType}
                 </h3>
                 <p className="mb-2 text-sm text-zinc-300">
@@ -487,8 +487,8 @@ export default function Home() {
 
             {/* Account contribution confirmation */}
             {accountConfirmation && (
-              <div className="mt-3 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <p className="text-sm text-green-400">{accountConfirmation}</p>
+              <div className="mt-3 p-4 bg-violet-500/10 border border-violet-500/30 rounded-lg">
+                <p className="text-sm text-violet-400">{accountConfirmation}</p>
               </div>
             )}
 
@@ -720,7 +720,7 @@ export default function Home() {
                 {(parseFloat(respAnnualContribution) || 0) > 0 && (
                   <p className="text-sm text-zinc-300">
                     Annual government CESG grant:{" "}
-                    <span className="font-semibold text-green-400">
+                    <span className="font-semibold text-violet-400">
                       {formatCurrency(Math.min((parseFloat(respAnnualContribution) || 0) * 0.20, 500))}
                     </span>
                   </p>
@@ -804,7 +804,7 @@ export default function Home() {
             <div className="mt-8 border-t border-zinc-800 pt-8">
               <div className="space-y-6">
                 {/* Projected Balance */}
-                <div className="rounded-lg bg-green-500/5 p-4">
+                <div className="rounded-lg bg-violet-500/5 p-4">
                   <p className="mb-1 text-sm font-medium text-zinc-400 uppercase tracking-widest">
                     {accountType === "TFSA" ? "Your TFSA Projection"
                       : accountType === "RRSP" ? "Your RRSP Projection"
@@ -852,15 +852,15 @@ export default function Home() {
                   >
                     <defs>
                       <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#22c55e" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                        <stop offset="5%"  stopColor="#8b5cf6" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="colorContributed" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%"  stopColor="#71717a" stopOpacity={0.2} />
                         <stop offset="95%" stopColor="#71717a" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1e1939" vertical={false} />
                     <XAxis
                       dataKey="year"
                       stroke="#71717a"
@@ -881,7 +881,7 @@ export default function Home() {
                     />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "#1a1a1a",
+                        backgroundColor: "#131326",
                         border: "1px solid #27272a",
                         borderRadius: "8px",
                         color: "#e4e4e7",
@@ -903,7 +903,7 @@ export default function Home() {
                     <Area
                       type="monotone"
                       dataKey="totalBalance"
-                      stroke="#22c55e"
+                      stroke="#8b5cf6"
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#colorBalance)"
@@ -926,7 +926,7 @@ export default function Home() {
                 {comparisonScenarios.map((scenario) => (
                     <div
                       key={scenario.label}
-                      className="min-w-0 overflow-hidden rounded-xl border border-zinc-800 bg-[#111111] p-5"
+                      className="min-w-0 overflow-hidden rounded-xl border border-zinc-800 bg-[#0d0d1e] p-5"
                     >
                       <p className="text-sm font-semibold text-zinc-50">{scenario.label}</p>
 
