@@ -27,9 +27,10 @@ function formatFull(value: number): string {
 
 export default function MoneyDisplay({ value }: { value: number }) {
   return (
-    <span className="relative inline-block group">
-      <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-zinc-700 bg-zinc-800 px-2 py-1 text-xs text-zinc-100">
+    <span className="relative inline group">
+      <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-zinc-800 text-zinc-50 text-sm font-semibold px-3 py-2 rounded-lg whitespace-nowrap border border-zinc-600 shadow-lg z-50">
         {formatFull(value)}
+        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800" />
       </span>
       {formatAbbreviated(value)}
     </span>
