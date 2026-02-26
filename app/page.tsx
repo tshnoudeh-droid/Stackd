@@ -320,8 +320,13 @@ export default function Home() {
 
     if (accountType === "TFSA") {
       const annual = parseFloat(tfsaAnnualContribution) || 0;
+      const historyYears = parseFloat(tfsaContributionYears) || 0;
+      const tfsaMax = new Date().getFullYear() - 2009;
       if (annual > 7_000) {
         return `You've exceeded the $7,000 annual TFSA limit. Maximum annual contribution is $7,000.`;
+      }
+      if (historyYears > tfsaMax) {
+        return `The TFSA has only existed since 2009 — you can't have more than ${tfsaMax} years of contribution history.`;
       }
       return null;
     }
@@ -363,11 +368,30 @@ export default function Home() {
       if (initial > 50_000) {
         return `Your initial investment of ${formatCurrency(initial)} exceeds the RESP lifetime limit of $50,000.`;
       }
+      const respMax = new Date().getFullYear() - 1974;
+      if (years > respMax) {
+        return `The RESP has only existed since 1974 — length of time can't exceed ${respMax} years.`;
+      }
       return null;
     }
 
+    // Length of Time cap warnings for all registered accounts
+    const years = parseFloat(lengthOfTime) || 0;
+    if (accountType === "RRSP") {
+      const rrspMax = new Date().getFullYear() - 1957;
+      if (years > rrspMax) {
+        return `The RRSP has only existed since 1957 — length of time can't exceed ${rrspMax} years.`;
+      }
+    }
+    if (accountType === "FHSA") {
+      const fhsaMax = new Date().getFullYear() - 2023;
+      if (years > fhsaMax) {
+        return `The FHSA has only existed since 2023 — length of time can't exceed ${fhsaMax} year${fhsaMax !== 1 ? "s" : ""}.`;
+      }
+    }
+
     return null;
-  }, [initialInvestment, accountType, tfsaAnnualContribution, rrspAnnualIncome, rrspAnnualContribution, fhsaAnnualContribution, respAnnualContribution, lengthOfTime]);
+  }, [initialInvestment, accountType, tfsaAnnualContribution, tfsaContributionYears, rrspAnnualIncome, rrspAnnualContribution, fhsaAnnualContribution, respAnnualContribution, lengthOfTime]);
 
   const accountConfirmation = useMemo(() => {
     if (accountType === "TFSA") {
@@ -402,6 +426,14 @@ export default function Home() {
     }
     return null;
   }, [accountType, tfsaAnnualContribution, rrspAnnualIncome, rrspAnnualContribution, fhsaAnnualContribution, respAnnualContribution, lengthOfTime]);
+
+  // Prevent non-numeric characters in number inputs
+  const blockChars = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+  };
+  const blockCharsInt = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
+  };
 
   const inputClass =
     "w-full rounded-lg border border-zinc-700 bg-[#0a0a0a] py-3 text-zinc-50 placeholder-zinc-500 transition-colors focus:border-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500/50";
@@ -512,6 +544,7 @@ export default function Home() {
                   id="initial-investment"
                   value={initialInvestment}
                   onChange={(e) => setInitialInvestment(e.target.value)}
+                  onKeyDown={blockChars}
                   placeholder="0"
                   min="0"
                   step="0.01"
@@ -522,24 +555,25 @@ export default function Home() {
 
             {/* Monthly Contribution — hidden for all registered account types */}
             {!["TFSA", "RRSP", "FHSA", "RESP"].includes(accountType) && (
-              <div>
-                <label htmlFor="monthly-contribution" className={labelClass}>
-                  Monthly Contribution
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
-                  <input
-                    type="number"
-                    id="monthly-contribution"
-                    value={monthlyContribution}
-                    onChange={(e) => setMonthlyContribution(e.target.value)}
-                    placeholder="0"
-                    min="0"
-                    step="0.01"
-                    className={`${inputClass} pl-8 pr-4`}
-                  />
-                </div>
+            <div>
+              <label htmlFor="monthly-contribution" className={labelClass}>
+                Monthly Contribution
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                <input
+                  type="number"
+                  id="monthly-contribution"
+                  value={monthlyContribution}
+                  onChange={(e) => setMonthlyContribution(e.target.value)}
+                  onKeyDown={blockChars}
+                  placeholder="0"
+                  min="0"
+                  step="0.01"
+                  className={`${inputClass} pl-8 pr-4`}
+                />
               </div>
+            </div>
             )}
 
             {/* TFSA-specific contribution fields */}
@@ -556,6 +590,7 @@ export default function Home() {
                       id="tfsa-annual-contribution"
                       value={tfsaAnnualContribution}
                       onChange={(e) => setTfsaAnnualContribution(e.target.value)}
+                      onKeyDown={blockCharsInt}
                       placeholder="0"
                       min="0"
                       max="7000"
@@ -577,6 +612,7 @@ export default function Home() {
                     id="tfsa-contribution-years"
                     value={tfsaContributionYears}
                     onChange={(e) => setTfsaContributionYears(e.target.value)}
+                    onKeyDown={blockCharsInt}
                     placeholder="0"
                     min="0"
                     max={new Date().getFullYear() - 2009}
@@ -613,6 +649,7 @@ export default function Home() {
                       id="rrsp-annual-income"
                       value={rrspAnnualIncome}
                       onChange={(e) => setRrspAnnualIncome(e.target.value)}
+                      onKeyDown={blockCharsInt}
                       placeholder="0"
                       min="0"
                       step="1"
@@ -644,6 +681,7 @@ export default function Home() {
                       id="rrsp-annual-contribution"
                       value={rrspAnnualContribution}
                       onChange={(e) => setRrspAnnualContribution(e.target.value)}
+                      onKeyDown={blockCharsInt}
                       placeholder="0"
                       min="0"
                       step="1"
@@ -668,6 +706,7 @@ export default function Home() {
                       id="fhsa-annual-contribution"
                       value={fhsaAnnualContribution}
                       onChange={(e) => setFhsaAnnualContribution(e.target.value)}
+                      onKeyDown={blockCharsInt}
                       placeholder="0"
                       min="0"
                       max="8000"
@@ -706,6 +745,7 @@ export default function Home() {
                       id="resp-annual-contribution"
                       value={respAnnualContribution}
                       onChange={(e) => setRespAnnualContribution(e.target.value)}
+                      onKeyDown={blockCharsInt}
                       placeholder="0"
                       min="0"
                       step="1"
@@ -748,6 +788,7 @@ export default function Home() {
                 id="length-of-time"
                 value={lengthOfTime}
                 onChange={(e) => setLengthOfTime(e.target.value)}
+                onKeyDown={blockCharsInt}
                 placeholder={`1–${
                   accountType === "RRSP" ? new Date().getFullYear() - 1957
                   : accountType === "FHSA" ? new Date().getFullYear() - 2023
@@ -792,6 +833,7 @@ export default function Home() {
                   id="annual-return"
                   value={annualReturn}
                   onChange={(e) => setAnnualReturn(e.target.value)}
+                  onKeyDown={blockChars}
                   placeholder="0"
                   min="0"
                   max="100"
@@ -949,30 +991,30 @@ export default function Home() {
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {comparisonScenarios.map((scenario) => (
-                    <div
-                      key={scenario.label}
-                      className="min-w-0 overflow-hidden rounded-xl border border-zinc-800 bg-[#111111] p-5"
-                    >
-                      <p className="text-sm font-semibold text-zinc-50">{scenario.label}</p>
+                  <div
+                    key={scenario.label}
+                    className="min-w-0 overflow-hidden rounded-xl border border-zinc-800 bg-[#111111] p-5"
+                  >
+                    <p className="text-sm font-semibold text-zinc-50">{scenario.label}</p>
 
-                      <div className="mt-4 mb-1">
+                    <div className="mt-4 mb-1">
                         <p className="text-xs text-zinc-500">You&apos;ll end up with</p>
-                      </div>
-                      <p className={`${cardNumberFontSize(scenario.totalBalance)} text-zinc-50`}>
+                    </div>
+                    <p className={`${cardNumberFontSize(scenario.totalBalance)} text-zinc-50`}>
                         <MoneyDisplay value={scenario.totalBalance} />
-                      </p>
+                    </p>
 
-                      <hr className="my-4 border-zinc-800" />
+                    <hr className="my-4 border-zinc-800" />
 
                       {!scenario.highlight && scenario.missedAmount > 0 && (
-                        <>
+                      <>
                           <p className="text-xs text-zinc-500">Lost Returns</p>
-                          <p className={`mt-1 ${cardNumberFontSize(scenario.missedAmount)} text-red-400`}>
+                        <p className={`mt-1 ${cardNumberFontSize(scenario.missedAmount)} text-red-400`}>
                             <MoneyDisplay value={scenario.missedAmount} />
-                          </p>
-                        </>
-                      )}
-                    </div>
+                        </p>
+                      </>
+                    )}
+                  </div>
                 ))}
               </div>
 
