@@ -335,6 +335,13 @@ export default function Home() {
         <p className="mt-2 text-center text-sm text-zinc-500 sm:text-left">
           See what your money can become.
         </p>
+        {accountType && (
+          <div className="mt-2 text-center sm:text-left">
+            <span className="inline-block px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-xs text-green-400 font-medium">
+              {accountType === "General" ? "Non-Registered Account" : accountType} Selected
+            </span>
+          </div>
+        )}
 
         {/* Calculator card */}
         <div className="relative mt-10 overflow-hidden rounded-lg border border-zinc-800 bg-[#1a1a1a] p-6 md:p-8">
@@ -497,6 +504,14 @@ export default function Home() {
               <div className="space-y-6">
                 {/* Projected Balance */}
                 <div className="rounded-lg bg-green-500/5 p-4">
+                  <p className="mb-1 text-sm font-medium text-zinc-400 uppercase tracking-widest">
+                    {accountType === "TFSA" ? "Your TFSA Projection"
+                      : accountType === "RRSP" ? "Your RRSP Projection"
+                      : accountType === "FHSA" ? "Your FHSA Projection"
+                      : accountType === "RESP" ? "Your RESP Projection"
+                      : accountType === "General" ? "Your Investment Projection"
+                      : "Your Projection"}
+                  </p>
                   <p className="mb-2 text-xs uppercase tracking-widest text-zinc-500">
                     Projected Balance
                   </p>
