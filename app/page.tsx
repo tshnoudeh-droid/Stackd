@@ -130,11 +130,13 @@ function calculateYearlyData(
   annualReturn: number,
   years: number,
   frequency: CompoundFrequency
-): Array<{ year: number; totalBalance: number; totalContributed: number }> {
+): Array<{ year: number; totalBalance: number; totalContributed: number; showLabel: boolean }> {
   const data = [];
   const r = annualReturn / 100;
   const n = getCompoundFrequencyPerYear(frequency);
   const PMT = getContributionPerPeriod(monthlyContribution, frequency);
+  const midpoint = Math.round(years / 2);
+  const labelYears = new Set([0, midpoint, years]);
 
   for (let t = 0; t <= years; t++) {
     const compoundPrincipal = initialInvestment * Math.pow(1 + r / n, n * t);
@@ -149,7 +151,7 @@ function calculateYearlyData(
     const totalBalance = compoundPrincipal + annuityValue;
     const totalContributed = initialInvestment + monthlyContribution * 12 * t;
 
-    data.push({ year: t, totalBalance, totalContributed });
+    data.push({ year: t, totalBalance, totalContributed, showLabel: labelYears.has(t) });
   }
 
   return data;
@@ -181,6 +183,29 @@ function cardNumberFontSize(amount: number): string {
   if (amount >= 10_000_000)  return "text-xl font-bold";
   return "text-2xl font-bold";
 }
+
+const ChartLabel = ({ x, y, value, showLabel }: { x?: number; y?: number; value?: number; showLabel?: boolean }) => {
+  if (!showLabel || value === undefined || value === null) return null;
+
+  const formatted = value >= 1e12 ? `$${(value / 1e12).toFixed(1)}T`
+    : value >= 1e9  ? `$${(value / 1e9).toFixed(1)}B`
+    : value >= 1e6  ? `$${(value / 1e6).toFixed(1)}M`
+    : value >= 1e3  ? `$${(value / 1e3).toFixed(0)}K`
+    : `$${value.toFixed(0)}`;
+
+  return (
+    <text
+      x={x}
+      y={(y ?? 0) - 8}
+      fill="#22c55e"
+      fontSize={11}
+      textAnchor="middle"
+      fontWeight="500"
+    >
+      {formatted}
+    </text>
+  );
+};
 
 export default function Home() {
   const [initialInvestment, setInitialInvestment] = useState<string>("");
@@ -560,6 +585,7 @@ export default function Home() {
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#colorBalance)"
+                      label={<ChartLabel />}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
