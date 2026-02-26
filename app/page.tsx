@@ -198,8 +198,8 @@ const CustomDotLabel = (props: any) => {
   const formatted = value >= 1e12 ? `$${(value / 1e12).toFixed(1)}T`
     : value >= 1e9  ? `$${(value / 1e9).toFixed(1)}B`
     : value >= 1e6  ? `$${(value / 1e6).toFixed(1)}M`
-    : value >= 1e3  ? `$${(value / 1e3).toFixed(0)}K`
-    : `$${Math.round(value)}`;
+    : value >= 1e3  ? `$${(value / 1e3).toFixed(1)}K`
+    : `$${value.toFixed(1)}`;
 
   return (
     <g>
