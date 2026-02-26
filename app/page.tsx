@@ -432,6 +432,74 @@ export default function Home() {
           <h2 className="mb-6 text-xl font-semibold">Calculator</h2>
 
           <form className="space-y-5">
+            {/* Account Type — first step */}
+            <div>
+              <label htmlFor="account-type" className={labelClass}>
+                Account Type
+              </label>
+              <select
+                id="account-type"
+                value={accountType}
+                onChange={(e) => setAccountType(e.target.value as AccountType)}
+                className={`${inputClass} cursor-pointer px-4`}
+              >
+                <option value="">Select an account type</option>
+                <option value="TFSA">TFSA</option>
+                <option value="RRSP">RRSP</option>
+                <option value="FHSA">FHSA</option>
+                <option value="RESP">RESP</option>
+                <option value="General">Non-Registered Account</option>
+              </select>
+            </div>
+
+            {/* Account Type Info Box */}
+            {accountType && ACCOUNT_INFO[accountType] && (
+              <div className="rounded-lg border border-green-500/30 bg-[#0a0a0a] p-4">
+                <h3 className="mb-2 text-lg font-semibold text-green-400">
+                  {accountType === "General" ? "Non-Registered Account" : accountType}
+                </h3>
+                <p className="mb-2 text-sm text-zinc-300">
+                  <span className="font-medium">What it is:</span>{" "}
+                  {ACCOUNT_INFO[accountType].description}
+                </p>
+                <p className="mb-2 text-sm text-zinc-300">
+                  <span className="font-medium">Contribution Limit:</span>{" "}
+                  {ACCOUNT_INFO[accountType].limit}
+                </p>
+                <p className="text-sm text-zinc-300">
+                  <span className="font-medium">Tax Advantage:</span>{" "}
+                  {ACCOUNT_INFO[accountType].taxAdvantage}
+                </p>
+              </div>
+            )}
+
+            {/* Prompt when no account selected */}
+            {!accountType && (
+              <p className="text-sm text-zinc-500 mt-2">Select an account type above to get started.</p>
+            )}
+
+            {/* Account Contribution Warning */}
+            {accountWarning && (
+              <div className="mt-3 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                <p className="text-sm text-yellow-400">⚠️ {accountWarning}</p>
+              </div>
+            )}
+
+            {/* Account contribution confirmation */}
+            {accountConfirmation && (
+              <div className="mt-3 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+                <p className="text-sm text-green-400">{accountConfirmation}</p>
+              </div>
+            )}
+
+            {/* All other fields — locked until account type is chosen */}
+            <div className={accountType ? "space-y-5" : "space-y-5 opacity-30 pointer-events-none select-none"}>
+              {!accountType && (
+                <div className="text-center py-4">
+                  <p className="text-sm text-zinc-600">Choose an account type above to unlock the calculator.</p>
+                </div>
+              )}
+
             {/* Initial Investment */}
             <div>
               <label htmlFor="initial-investment" className={labelClass}>
@@ -728,60 +796,7 @@ export default function Home() {
               </select>
             </div>
 
-            {/* Account Type */}
-            <div>
-              <label htmlFor="account-type" className={labelClass}>
-                Account Type
-              </label>
-              <select
-                id="account-type"
-                value={accountType}
-                onChange={(e) => setAccountType(e.target.value as AccountType)}
-                className={`${inputClass} cursor-pointer px-4`}
-              >
-                <option value="">Select an account type</option>
-                <option value="TFSA">TFSA</option>
-                <option value="RRSP">RRSP</option>
-                <option value="FHSA">FHSA</option>
-                <option value="RESP">RESP</option>
-                <option value="General">Non-Registered Account</option>
-              </select>
             </div>
-
-            {/* Account Type Info Box */}
-            {accountType && ACCOUNT_INFO[accountType] && (
-              <div className="rounded-lg border border-green-500/30 bg-[#0a0a0a] p-4">
-                <h3 className="mb-2 text-lg font-semibold text-green-400">
-                  {accountType === "General" ? "Non-Registered Account" : accountType}
-                </h3>
-                <p className="mb-2 text-sm text-zinc-300">
-                  <span className="font-medium">What it is:</span>{" "}
-                  {ACCOUNT_INFO[accountType].description}
-                </p>
-                <p className="mb-2 text-sm text-zinc-300">
-                  <span className="font-medium">Contribution Limit:</span>{" "}
-                  {ACCOUNT_INFO[accountType].limit}
-                </p>
-                <p className="text-sm text-zinc-300">
-                  <span className="font-medium">Tax Advantage:</span>{" "}
-                  {ACCOUNT_INFO[accountType].taxAdvantage}
-                </p>
-              </div>
-            )}
-
-            {/* Account Contribution Warning */}
-            {accountWarning && (
-              <div className="mt-3 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                <p className="text-sm text-yellow-400">⚠️ {accountWarning}</p>
-              </div>
-            )}
-
-            {/* Account contribution confirmation */}
-            {accountConfirmation && (
-              <div className="mt-3 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <p className="text-sm text-green-400">{accountConfirmation}</p>
-              </div>
-            )}
           </form>
 
           {/* ── Results ── */}
