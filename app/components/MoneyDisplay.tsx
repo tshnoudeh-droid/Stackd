@@ -27,12 +27,11 @@ function formatFull(value: number): string {
 
 export default function MoneyDisplay({ value }: { value: number }) {
   return (
-    <span
-      title={formatFull(value)}
-      className="border-b border-dotted border-zinc-600 cursor-help"
-    >
+    <span className="relative inline-block group">
+      <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-zinc-700 bg-zinc-800 px-2 py-1 text-xs text-zinc-100">
+        {formatFull(value)}
+      </span>
       {formatAbbreviated(value)}
     </span>
   );
 }
-
