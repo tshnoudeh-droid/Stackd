@@ -440,7 +440,7 @@ export default function Home() {
   const labelClass = "block text-sm font-medium mb-2 text-zinc-300";
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-zinc-50">
+    <div className="min-h-screen bg-white text-zinc-900">
       <div className="container mx-auto max-w-2xl px-4 pt-14 pb-0 sm:px-6 lg:px-8">
 
         {/* Header */}
