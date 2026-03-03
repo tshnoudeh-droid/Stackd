@@ -1029,9 +1029,16 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <p className="pb-8 pt-8 text-center text-xs text-zinc-600">
+        <p className="pb-4 pt-8 text-center text-xs text-zinc-600">
           Stackd is for educational purposes only. Not financial advice.
         </p>
+        <footer className="text-center pb-8 pt-2 space-x-3 text-xs text-zinc-600">
+          <span>Built by Tawfic Shnoudeh</span>
+          <span>·</span>
+          <a href="https://www.linkedin.com/in/tawficshnoudeh" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-400 transition-colors">LinkedIn</a>
+          <span>·</span>
+          <a href="https://tawficshnoudeh.com" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-400 transition-colors">tawficshnoudeh.com</a>
+        </footer>
       </div>
     </div>
   );
