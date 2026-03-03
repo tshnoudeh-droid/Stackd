@@ -317,6 +317,7 @@ export default function Home() {
     if (!accountType || accountType === "General") return null;
 
     const initial = parseFloat(initialInvestment) || 0;
+    const years = parseFloat(lengthOfTime) || 0;
 
     if (accountType === "TFSA") {
       const annual = parseFloat(tfsaAnnualContribution) || 0;
@@ -328,16 +329,32 @@ export default function Home() {
       if (historyYears > tfsaMax) {
         return `The TFSA has only existed since 2009 — you can't have more than ${tfsaMax} years of contribution history.`;
       }
+      if (initial > 0 && historyYears > 0) {
+        const totalRoom = Math.min(historyYears, tfsaMax) * 7_000;
+        if (initial > totalRoom) {
+          return `Your initial investment of ${formatCurrency(initial)} exceeds your estimated TFSA room of ${formatCurrency(totalRoom)}. You may be over-contributing.`;
+        }
+      }
       return null;
     }
 
     if (accountType === "RRSP") {
       const income = parseFloat(rrspAnnualIncome) || 0;
       const annual = parseFloat(rrspAnnualContribution) || 0;
+      const rrspMax = new Date().getFullYear() - 1957;
+      if (years > 69) {
+        return `RRSPs must be converted to a RRIF by age 71. A projection beyond 69 years is not realistic for RRSP planning — consider capping at 69 years.`;
+      }
+      if (years > rrspMax) {
+        return `The RRSP has only existed since 1957 — length of time can't exceed ${rrspMax} years.`;
+      }
+      if (annual > 31_560) {
+        return `Your annual contribution of ${formatCurrency(annual)} exceeds the absolute RRSP maximum of $31,560/year regardless of income.`;
+      }
       if (annual > 0 && income > 0) {
         const limit = Math.min(income * 0.18, 31_560);
         if (annual > limit) {
-          return `Your annual contribution of ${formatCurrency(annual)} exceeds your RRSP limit of ${formatCurrency(limit)}. Consider reducing your contribution.`;
+          return `Your annual contribution of ${formatCurrency(annual)} exceeds your RRSP limit of ${formatCurrency(limit)} (18% of your income). Consider reducing your contribution.`;
         }
       }
       return null;
@@ -345,15 +362,22 @@ export default function Home() {
 
     if (accountType === "FHSA") {
       const annual = parseFloat(fhsaAnnualContribution) || 0;
+      const fhsaMax = new Date().getFullYear() - 2023;
+      if (years > 15) {
+        return `FHSAs can only be held for a maximum of 15 years by law. After that, they must be closed or transferred to an RRSP/RRIF.`;
+      }
+      if (years > fhsaMax) {
+        return `The FHSA has only existed since 2023 — length of time can't exceed ${fhsaMax} year${fhsaMax !== 1 ? "s" : ""}.`;
+      }
       if (annual > 8_000) {
         return `Your annual contribution of ${formatCurrency(annual)} exceeds the FHSA annual limit of $8,000.`;
       }
       if (initial > 40_000) {
         return `Your initial investment of ${formatCurrency(initial)} exceeds the FHSA lifetime limit of $40,000.`;
       }
-      const years = parseFloat(lengthOfTime) || 0;
-      if (annual > 0 && annual * years > 40_000) {
-        const yearsUntilLimit = Math.floor(40_000 / annual);
+      if (initial + (annual * years) > 40_000) {
+        const remainingRoom = Math.max(0, 40_000 - initial);
+        const yearsUntilLimit = annual > 0 ? Math.floor(remainingRoom / annual) : 0;
         return `You'll hit the $40,000 FHSA lifetime limit in ${yearsUntilLimit} year${yearsUntilLimit !== 1 ? "s" : ""}. After that, no new contributions can be made.`;
       }
       return null;
@@ -361,33 +385,19 @@ export default function Home() {
 
     if (accountType === "RESP") {
       const annual = parseFloat(respAnnualContribution) || 0;
-      const years = parseFloat(lengthOfTime) || 0;
-      if (annual > 0 && annual * years > 50_000) {
-        return `Your lifetime RESP contributions (${formatCurrency(annual * years)}) will exceed the $50,000 limit. Consider reducing your annual contribution.`;
-      }
-      if (initial > 50_000) {
-        return `Your initial investment of ${formatCurrency(initial)} exceeds the RESP lifetime limit of $50,000.`;
-      }
       const respMax = new Date().getFullYear() - 1974;
       if (years > respMax) {
         return `The RESP has only existed since 1974 — length of time can't exceed ${respMax} years.`;
       }
+      if (initial > 50_000) {
+        return `Your initial investment of ${formatCurrency(initial)} exceeds the RESP lifetime limit of $50,000.`;
+      }
+      if (annual > 0 && initial + annual * years > 50_000) {
+        const remainingRoom = Math.max(0, 50_000 - initial);
+        const yearsUntilLimit = annual > 0 ? Math.floor(remainingRoom / annual) : 0;
+        return `Your total contributions (${formatCurrency(initial + annual * years)}) will exceed the $50,000 RESP lifetime limit. You'll hit the cap in ${yearsUntilLimit} year${yearsUntilLimit !== 1 ? "s" : ""}.`;
+      }
       return null;
-    }
-
-    // Length of Time cap warnings for all registered accounts
-    const years = parseFloat(lengthOfTime) || 0;
-    if (accountType === "RRSP") {
-      const rrspMax = new Date().getFullYear() - 1957;
-      if (years > rrspMax) {
-        return `The RRSP has only existed since 1957 — length of time can't exceed ${rrspMax} years.`;
-      }
-    }
-    if (accountType === "FHSA") {
-      const fhsaMax = new Date().getFullYear() - 2023;
-      if (years > fhsaMax) {
-        return `The FHSA has only existed since 2023 — length of time can't exceed ${fhsaMax} year${fhsaMax !== 1 ? "s" : ""}.`;
-      }
     }
 
     return null;
@@ -436,11 +446,11 @@ export default function Home() {
   };
 
   const inputClass =
-    "w-full rounded-lg border border-[#C8B89A] bg-[#F5F0E7] py-3 text-[#2A1A0C] placeholder-[#B89A82] transition-colors focus:border-[#3A6B50]/60 focus:outline-none focus:ring-2 focus:ring-[#3A6B50]/15";
+    "w-full rounded-lg border border-[#C8B89A] bg-[#F5F0E7] py-3 text-[#3D2010] placeholder-[#B89A82] transition-colors focus:border-[#3A6B50]/60 focus:outline-none focus:ring-2 focus:ring-[#3A6B50]/15";
   const labelClass = "block text-sm font-medium mb-2 text-[#6B4E38]";
 
   return (
-    <div className="min-h-screen bg-[#EDE8DF] text-[#2A1A0C]">
+    <div className="min-h-screen bg-[#EDE8DF] text-[#3D2010]">
       <div className="container mx-auto max-w-2xl px-4 pt-14 pb-0 sm:px-6 lg:px-8">
 
         {/* Header */}
@@ -627,7 +637,7 @@ export default function Home() {
                 {parseFloat(tfsaContributionYears) > 0 && (
                   <p className="text-sm text-[#6B4E38]">
                     Your estimated total TFSA room:{" "}
-                    <span className="font-semibold text-[#2A1A0C]">
+                    <span className="font-semibold text-[#3D2010]">
                       {formatCurrency(Math.min(parseFloat(tfsaContributionYears) || 0, new Date().getFullYear() - 2009) * 7_000)}
                     </span>
                   </p>
@@ -664,7 +674,7 @@ export default function Home() {
                 {(parseFloat(rrspAnnualIncome) || 0) > 0 && (
                   <p className="text-sm text-[#6B4E38]">
                     Your RRSP annual limit:{" "}
-                    <span className="font-semibold text-[#2A1A0C]">
+                    <span className="font-semibold text-[#3D2010]">
                       {formatCurrency(Math.min((parseFloat(rrspAnnualIncome) || 0) * 0.18, 31_560))}
                     </span>
                   </p>
@@ -722,7 +732,7 @@ export default function Home() {
                 {(parseFloat(fhsaAnnualContribution) || 0) > 0 && (parseFloat(lengthOfTime) || 0) > 0 && (
                   <p className="text-sm text-[#6B4E38]">
                     Lifetime contributions so far:{" "}
-                    <span className="font-semibold text-[#2A1A0C]">
+                    <span className="font-semibold text-[#3D2010]">
                       {formatCurrency((parseFloat(fhsaAnnualContribution) || 0) * (parseFloat(lengthOfTime) || 0))}
                     </span>{" "}
                     of $40,000
@@ -769,7 +779,7 @@ export default function Home() {
                 {(parseFloat(respAnnualContribution) || 0) > 0 && (parseFloat(lengthOfTime) || 0) > 0 && (
                   <p className="text-sm text-[#6B4E38]">
                     Lifetime contributions:{" "}
-                    <span className="font-semibold text-[#2A1A0C]">
+                    <span className="font-semibold text-[#3D2010]">
                       {formatCurrency((parseFloat(respAnnualContribution) || 0) * (parseFloat(lengthOfTime) || 0))}
                     </span>{" "}
                     of $50,000
@@ -892,13 +902,13 @@ export default function Home() {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <p className="mb-1 text-xs text-[#9C7A62]">Total Amount Contributed</p>
-                    <p className="text-2xl font-semibold text-[#2A1A0C]">
+                    <p className="text-2xl font-semibold text-[#3D2010]">
                       <MoneyDisplay value={results.totalContributed} />
                     </p>
                   </div>
                   <div>
                     <p className="mb-1 text-xs text-[#9C7A62]">Total Interest Earned</p>
-                    <p className="text-2xl font-semibold text-[#2A1A0C]">
+                    <p className="text-2xl font-semibold text-[#3D2010]">
                       <MoneyDisplay value={results.totalInterest} />
                     </p>
                   </div>
@@ -951,7 +961,7 @@ export default function Home() {
                         backgroundColor: "#FAF8F4",
                         border: "1px solid #DDD0BC",
                         borderRadius: "8px",
-                        color: "#2A1A0C",
+                        color: "#3D2010",
                       }}
                       labelStyle={{ color: "#9C7A62", marginBottom: "4px" }}
                       labelFormatter={(label) => `Year ${label}`}
@@ -995,12 +1005,12 @@ export default function Home() {
                     key={scenario.label}
                     className="min-w-0 overflow-hidden rounded-xl border border-[#DDD0BC] bg-[#EEE8DC] p-5"
                   >
-                    <p className="text-sm font-semibold text-[#2A1A0C]">{scenario.label}</p>
+                    <p className="text-sm font-semibold text-[#3D2010]">{scenario.label}</p>
 
                     <div className="mt-4 mb-1">
                         <p className="text-xs text-[#9C7A62]">You&apos;ll end up with</p>
                     </div>
-                    <p className={`${cardNumberFontSize(scenario.totalBalance)} text-[#2A1A0C]`}>
+                    <p className={`${cardNumberFontSize(scenario.totalBalance)} text-[#3D2010]`}>
                         <MoneyDisplay value={scenario.totalBalance} />
                     </p>
 
@@ -1035,9 +1045,9 @@ export default function Home() {
         <footer className="text-center pb-8 pt-2 space-x-3 text-xs text-[#B89A82]">
           <span>Built by Tawfic Shnoudeh</span>
           <span>·</span>
-          <a href="https://www.linkedin.com/in/tawficshnoudeh" target="_blank" rel="noopener noreferrer" className="hover:text-[#2A1A0C] transition-colors">LinkedIn</a>
+          <a href="https://www.linkedin.com/in/tawficshnoudeh" target="_blank" rel="noopener noreferrer" className="hover:text-[#3D2010] transition-colors">LinkedIn</a>
           <span>·</span>
-          <a href="https://tawficshnoudeh.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#2A1A0C] transition-colors">tawficshnoudeh.com</a>
+          <a href="https://tawficshnoudeh.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#3D2010] transition-colors">tawficshnoudeh.com</a>
         </footer>
       </div>
     </div>
