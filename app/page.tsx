@@ -178,9 +178,9 @@ function isValidInputs(
 }
 
 function balanceFontSize(amount: number): string {
-  if (amount >= 100_000_000) return "text-2xl font-bold text-green-400";
-  if (amount >= 1_000_000)   return "text-3xl font-bold text-green-400";
-  return "text-4xl font-bold text-green-400 md:text-5xl";
+  if (amount >= 100_000_000) return "text-2xl font-bold text-green-600";
+  if (amount >= 1_000_000)   return "text-3xl font-bold text-green-600";
+  return "text-4xl font-bold text-green-600 md:text-5xl";
 }
 
 function cardNumberFontSize(amount: number): string {
@@ -203,8 +203,8 @@ const CustomDotLabel = (props: any) => {
 
   return (
     <g>
-      <circle cx={x} cy={y} r={4} fill="#22c55e" stroke="#0a0a0a" strokeWidth={2} />
-      <text x={x} y={y - 12} textAnchor="middle" fill="#22c55e" fontSize={11} fontWeight="600">
+      <circle cx={x} cy={y} r={4} fill="#16a34a" stroke="#FFFDF8" strokeWidth={2} />
+      <text x={x} y={y - 12} textAnchor="middle" fill="#16a34a" fontSize={11} fontWeight="600">
         {formatted}
       </text>
     </g>
@@ -436,30 +436,30 @@ export default function Home() {
   };
 
   const inputClass =
-    "w-full rounded-lg border border-zinc-700 bg-[#0a0a0a] py-3 text-zinc-50 placeholder-zinc-500 transition-colors focus:border-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500/50";
-  const labelClass = "block text-sm font-medium mb-2 text-zinc-300";
+    "w-full rounded-lg border border-[#D4C4A8] bg-[#FBF7F0] py-3 text-stone-800 placeholder-stone-400 transition-colors focus:border-green-600/50 focus:outline-none focus:ring-2 focus:ring-green-600/20";
+  const labelClass = "block text-sm font-medium mb-2 text-stone-600";
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900">
+    <div className="min-h-screen bg-[#F7F3EC] text-stone-800">
       <div className="container mx-auto max-w-2xl px-4 pt-14 pb-0 sm:px-6 lg:px-8">
 
         {/* Header */}
         <h1 className="text-center text-4xl font-semibold sm:text-left">Stackd</h1>
-        <p className="mt-2 text-center text-sm text-zinc-500 sm:text-left">
+        <p className="mt-2 text-center text-sm text-stone-500 sm:text-left">
           See what your money can become.
         </p>
         {accountType && (
           <div className="mt-2 text-center sm:text-left">
-            <span className="inline-block px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-xs text-green-400 font-medium">
+            <span className="inline-block px-3 py-1 bg-green-100 border border-green-300 rounded-full text-xs text-green-700 font-medium">
               {accountType === "General" ? "Non-Registered Account" : accountType} Selected
             </span>
           </div>
         )}
 
         {/* Calculator card */}
-        <div className="relative mt-10 overflow-hidden rounded-lg border border-zinc-800 bg-[#1a1a1a] p-6 md:p-8">
+        <div className="relative mt-10 overflow-hidden rounded-xl border border-[#E5D9C8] bg-[#FFFDF8] p-6 shadow-md md:p-8">
           {/* Faint green top accent line */}
-          <div className="absolute inset-x-0 top-0 h-px bg-green-500/20" />
+          <div className="absolute inset-x-0 top-0 h-[2px] bg-green-600/30" />
 
           <h2 className="mb-6 text-xl font-semibold">Calculator</h2>
 
@@ -486,19 +486,19 @@ export default function Home() {
 
             {/* Account Type Info Box */}
             {accountType && ACCOUNT_INFO[accountType] && (
-              <div className="rounded-lg border border-green-500/30 bg-[#0a0a0a] p-4">
-                <h3 className="mb-2 text-lg font-semibold text-green-400">
+              <div className="rounded-lg border border-green-600/30 bg-green-50/60 p-4">
+                <h3 className="mb-2 text-lg font-semibold text-green-700">
                   {accountType === "General" ? "Non-Registered Account" : accountType}
                 </h3>
-                <p className="mb-2 text-sm text-zinc-300">
+                <p className="mb-2 text-sm text-stone-600">
                   <span className="font-medium">What it is:</span>{" "}
                   {ACCOUNT_INFO[accountType].description}
                 </p>
-                <p className="mb-2 text-sm text-zinc-300">
+                <p className="mb-2 text-sm text-stone-600">
                   <span className="font-medium">Contribution Limit:</span>{" "}
                   {ACCOUNT_INFO[accountType].limit}
                 </p>
-                <p className="text-sm text-zinc-300">
+                <p className="text-sm text-stone-600">
                   <span className="font-medium">Tax Advantage:</span>{" "}
                   {ACCOUNT_INFO[accountType].taxAdvantage}
                 </p>
@@ -507,20 +507,20 @@ export default function Home() {
 
             {/* Prompt when no account selected */}
             {!accountType && (
-              <p className="text-sm text-zinc-500 mt-2">Select an account type above to get started.</p>
+              <p className="text-sm text-stone-500 mt-2">Select an account type above to get started.</p>
             )}
 
             {/* Account Contribution Warning */}
             {accountWarning && (
-              <div className="mt-3 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                <p className="text-sm text-yellow-400">⚠️ {accountWarning}</p>
+              <div className="mt-3 p-4 bg-yellow-50 border border-yellow-300 rounded-lg">
+                <p className="text-sm text-yellow-700">⚠️ {accountWarning}</p>
               </div>
             )}
 
             {/* Account contribution confirmation */}
             {accountConfirmation && (
-              <div className="mt-3 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <p className="text-sm text-green-400">{accountConfirmation}</p>
+              <div className="mt-3 p-4 bg-green-50 border border-green-300 rounded-lg">
+                <p className="text-sm text-green-700">{accountConfirmation}</p>
               </div>
             )}
 
@@ -528,7 +528,7 @@ export default function Home() {
             <div className={accountType ? "space-y-5" : "space-y-5 opacity-30 pointer-events-none select-none"}>
               {!accountType && (
                 <div className="text-center py-4">
-                  <p className="text-sm text-zinc-600">Choose an account type above to unlock the calculator.</p>
+                  <p className="text-sm text-stone-400">Choose an account type above to unlock the calculator.</p>
                 </div>
               )}
 
@@ -538,7 +538,7 @@ export default function Home() {
                 Initial Investment
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500">$</span>
                 <input
                   type="number"
                   id="initial-investment"
@@ -560,7 +560,7 @@ export default function Home() {
                 Monthly Contribution
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500">$</span>
                 <input
                   type="number"
                   id="monthly-contribution"
@@ -584,7 +584,7 @@ export default function Home() {
                     Annual Contribution
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500">$</span>
                     <input
                       type="number"
                       id="tfsa-annual-contribution"
@@ -598,7 +598,7 @@ export default function Home() {
                       className={`${inputClass} pl-8 pr-4`}
                     />
                   </div>
-                  <p className="mt-1.5 text-xs text-zinc-500">
+                  <p className="mt-1.5 text-xs text-stone-500">
                     TFSA annual limit is $7,000/year. Your remaining room depends on your age and contribution history.
                   </p>
                 </div>
@@ -619,15 +619,15 @@ export default function Home() {
                     step="1"
                     className={`${inputClass} px-4`}
                   />
-                  <p className="mt-1.5 text-xs text-zinc-500">
+                  <p className="mt-1.5 text-xs text-stone-500">
                     How many years have you been eligible for a TFSA? (18+ years old). Each year adds $7,000 of room. Max {new Date().getFullYear() - 2009} years — the TFSA has existed since 2009.
                   </p>
                 </div>
 
                 {parseFloat(tfsaContributionYears) > 0 && (
-                  <p className="text-sm text-zinc-300">
+                  <p className="text-sm text-stone-600">
                     Your estimated total TFSA room:{" "}
-                    <span className="font-semibold text-zinc-50">
+                    <span className="font-semibold text-stone-800">
                       {formatCurrency(Math.min(parseFloat(tfsaContributionYears) || 0, new Date().getFullYear() - 2009) * 7_000)}
                     </span>
                   </p>
@@ -643,7 +643,7 @@ export default function Home() {
                     Your Annual Income
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500">$</span>
                     <input
                       type="number"
                       id="rrsp-annual-income"
@@ -656,15 +656,15 @@ export default function Home() {
                       className={`${inputClass} pl-8 pr-4`}
                     />
                   </div>
-                  <p className="mt-1.5 text-xs text-zinc-500">
+                  <p className="mt-1.5 text-xs text-stone-500">
                     RRSP contribution limit is 18% of your previous year&apos;s income, up to $31,560/year.
                   </p>
                 </div>
 
                 {(parseFloat(rrspAnnualIncome) || 0) > 0 && (
-                  <p className="text-sm text-zinc-300">
+                  <p className="text-sm text-stone-600">
                     Your RRSP annual limit:{" "}
-                    <span className="font-semibold text-zinc-50">
+                    <span className="font-semibold text-stone-800">
                       {formatCurrency(Math.min((parseFloat(rrspAnnualIncome) || 0) * 0.18, 31_560))}
                     </span>
                   </p>
@@ -675,7 +675,7 @@ export default function Home() {
                     Annual Contribution
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500">$</span>
                     <input
                       type="number"
                       id="rrsp-annual-contribution"
@@ -700,7 +700,7 @@ export default function Home() {
                     Annual Contribution
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500">$</span>
                     <input
                       type="number"
                       id="fhsa-annual-contribution"
@@ -714,15 +714,15 @@ export default function Home() {
                       className={`${inputClass} pl-8 pr-4`}
                     />
                   </div>
-                  <p className="mt-1.5 text-xs text-zinc-500">
+                  <p className="mt-1.5 text-xs text-stone-500">
                     FHSA annual limit is $8,000/year with a $40,000 lifetime maximum. Only available to first-time home buyers.
                   </p>
                 </div>
 
                 {(parseFloat(fhsaAnnualContribution) || 0) > 0 && (parseFloat(lengthOfTime) || 0) > 0 && (
-                  <p className="text-sm text-zinc-300">
+                  <p className="text-sm text-stone-600">
                     Lifetime contributions so far:{" "}
-                    <span className="font-semibold text-zinc-50">
+                    <span className="font-semibold text-stone-800">
                       {formatCurrency((parseFloat(fhsaAnnualContribution) || 0) * (parseFloat(lengthOfTime) || 0))}
                     </span>{" "}
                     of $40,000
@@ -739,7 +739,7 @@ export default function Home() {
                     Annual Contribution
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500">$</span>
                     <input
                       type="number"
                       id="resp-annual-contribution"
@@ -752,24 +752,24 @@ export default function Home() {
                       className={`${inputClass} pl-8 pr-4`}
                     />
                   </div>
-                  <p className="mt-1.5 text-xs text-zinc-500">
+                  <p className="mt-1.5 text-xs text-stone-500">
                     RESP lifetime limit is $50,000 per child. The government adds a 20% CESG grant on the first $2,500/year (up to $500/year in free money).
                   </p>
                 </div>
 
                 {(parseFloat(respAnnualContribution) || 0) > 0 && (
-                  <p className="text-sm text-zinc-300">
+                  <p className="text-sm text-stone-600">
                     Annual government CESG grant:{" "}
-                    <span className="font-semibold text-green-400">
+                    <span className="font-semibold text-green-700">
                       {formatCurrency(Math.min((parseFloat(respAnnualContribution) || 0) * 0.20, 500))}
                     </span>
                   </p>
                 )}
 
                 {(parseFloat(respAnnualContribution) || 0) > 0 && (parseFloat(lengthOfTime) || 0) > 0 && (
-                  <p className="text-sm text-zinc-300">
+                  <p className="text-sm text-stone-600">
                     Lifetime contributions:{" "}
-                    <span className="font-semibold text-zinc-50">
+                    <span className="font-semibold text-stone-800">
                       {formatCurrency((parseFloat(respAnnualContribution) || 0) * (parseFloat(lengthOfTime) || 0))}
                     </span>{" "}
                     of $50,000
@@ -806,17 +806,17 @@ export default function Home() {
                 className={`${inputClass} px-4`}
               />
               {accountType === "RRSP" && (
-                <p className="mt-1.5 text-xs text-zinc-500">
+                <p className="mt-1.5 text-xs text-stone-500">
                   Max {new Date().getFullYear() - 1957} years — the RRSP has existed since 1957.
                 </p>
               )}
               {accountType === "FHSA" && (
-                <p className="mt-1.5 text-xs text-zinc-500">
+                <p className="mt-1.5 text-xs text-stone-500">
                   Max {new Date().getFullYear() - 2023} years — the FHSA has only existed since 2023.
                 </p>
               )}
               {accountType === "RESP" && (
-                <p className="mt-1.5 text-xs text-zinc-500">
+                <p className="mt-1.5 text-xs text-stone-500">
                   Max {new Date().getFullYear() - 1974} years — the RESP has existed since 1974.
                 </p>
               )}
@@ -840,7 +840,7 @@ export default function Home() {
                   step="0.1"
                   className={`${inputClass} pl-4 pr-8`}
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400">%</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500">%</span>
               </div>
             </div>
 
@@ -868,11 +868,11 @@ export default function Home() {
 
           {/* ── Results ── */}
           {results && (
-            <div className="mt-8 border-t border-zinc-800 pt-8">
+            <div className="mt-8 border-t border-[#E5D9C8] pt-8">
               <div className="space-y-6">
                 {/* Projected Balance */}
-                <div className="rounded-lg bg-green-500/5 p-4">
-                  <p className="mb-1 text-sm font-medium text-zinc-400 uppercase tracking-widest">
+                <div className="rounded-lg bg-green-50 border border-green-200 p-4">
+                  <p className="mb-1 text-sm font-medium text-stone-500 uppercase tracking-widest">
                     {accountType === "TFSA" ? "Your TFSA Projection"
                       : accountType === "RRSP" ? "Your RRSP Projection"
                       : accountType === "FHSA" ? "Your FHSA Projection"
@@ -880,7 +880,7 @@ export default function Home() {
                       : accountType === "General" ? "Your Investment Projection"
                       : "Your Projection"}
                   </p>
-                  <p className="mb-2 text-xs uppercase tracking-widest text-zinc-500">
+                  <p className="mb-2 text-xs uppercase tracking-widest text-stone-500">
                     Projected Balance
                   </p>
                   <p className={balanceFontSize(results.totalBalance)}>
@@ -891,14 +891,14 @@ export default function Home() {
                 {/* Contributed + Interest */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
-                    <p className="mb-1 text-xs text-zinc-500">Total Amount Contributed</p>
-                    <p className="text-2xl font-semibold text-zinc-50">
+                    <p className="mb-1 text-xs text-stone-500">Total Amount Contributed</p>
+                    <p className="text-2xl font-semibold text-stone-800">
                       <MoneyDisplay value={results.totalContributed} />
                     </p>
                   </div>
                   <div>
-                    <p className="mb-1 text-xs text-zinc-500">Total Interest Earned</p>
-                    <p className="text-2xl font-semibold text-zinc-50">
+                    <p className="mb-1 text-xs text-stone-500">Total Interest Earned</p>
+                    <p className="text-2xl font-semibold text-stone-800">
                       <MoneyDisplay value={results.totalInterest} />
                     </p>
                   </div>
@@ -909,7 +909,7 @@ export default function Home() {
 
           {/* ── Growth Chart ── */}
           {chartData && chartData.length > 0 && (
-            <div className="mt-8 border-t border-zinc-800 pt-8">
+            <div className="mt-8 border-t border-[#E5D9C8] pt-8">
               <h3 className="mb-6 text-xl font-semibold">Growth Over Time</h3>
               <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -919,25 +919,25 @@ export default function Home() {
                   >
                     <defs>
                       <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#22c55e" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                        <stop offset="5%"  stopColor="#16a34a" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#16a34a" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="colorContributed" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#71717a" stopOpacity={0.2} />
-                        <stop offset="95%" stopColor="#71717a" stopOpacity={0} />
+                        <stop offset="5%"  stopColor="#D4C4A8" stopOpacity={0.5} />
+                        <stop offset="95%" stopColor="#D4C4A8" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E5D9C8" vertical={false} />
                     <XAxis
                       dataKey="year"
-                      stroke="#71717a"
-                      tick={{ fill: "#71717a", fontSize: 12 }}
-                      tickLine={{ stroke: "#27272a" }}
+                      stroke="#B8A898"
+                      tick={{ fill: "#9C8270", fontSize: 12 }}
+                      tickLine={{ stroke: "#E5D9C8" }}
                     />
                     <YAxis
-                      stroke="#71717a"
-                      tick={{ fill: "#71717a", fontSize: 12 }}
-                      tickLine={{ stroke: "#27272a" }}
+                      stroke="#B8A898"
+                      tick={{ fill: "#9C8270", fontSize: 12 }}
+                      tickLine={{ stroke: "#E5D9C8" }}
                       tickFormatter={(value) => {
                         if (value >= 1_000_000_000_000) return `$${(value / 1_000_000_000_000).toFixed(1)}T`;
                         if (value >= 1_000_000_000)     return `$${(value / 1_000_000_000).toFixed(1)}B`;
@@ -948,12 +948,12 @@ export default function Home() {
                     />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "#1a1a1a",
-                        border: "1px solid #27272a",
+                        backgroundColor: "#FEF9F0",
+                        border: "1px solid #E5D9C8",
                         borderRadius: "8px",
-                        color: "#e4e4e7",
+                        color: "#3D2B1F",
                       }}
-                      labelStyle={{ color: "#a1a1aa", marginBottom: "4px" }}
+                      labelStyle={{ color: "#9C8270", marginBottom: "4px" }}
                       labelFormatter={(label) => `Year ${label}`}
                       formatter={(value) =>
                         typeof value === "number" ? formatCurrency(value) : value
@@ -962,7 +962,7 @@ export default function Home() {
                     <Area
                       type="monotone"
                       dataKey="totalContributed"
-                      stroke="#71717a"
+                      stroke="#C4B49A"
                       strokeWidth={1.5}
                       fillOpacity={1}
                       fill="url(#colorContributed)"
@@ -970,7 +970,7 @@ export default function Home() {
                     <Area
                       type="monotone"
                       dataKey="totalBalance"
-                      stroke="#22c55e"
+                      stroke="#16a34a"
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#colorBalance)"
@@ -984,32 +984,32 @@ export default function Home() {
 
           {/* ── What If You Waited? ── */}
           {comparisonScenarios && comparisonScenarios.length > 0 && (
-            <div className="mt-8 border-t border-zinc-800 pt-8">
+            <div className="mt-8 border-t border-[#E5D9C8] pt-8">
               <h3 className="mb-2 text-xl font-semibold">What If You Waited?</h3>
-              <p className="mb-6 text-xs text-zinc-500">
+              <p className="mb-6 text-xs text-stone-500">
                 Time in the market is your biggest advantage. See what waiting costs you.
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {comparisonScenarios.map((scenario) => (
                   <div
                     key={scenario.label}
-                    className="min-w-0 overflow-hidden rounded-xl border border-zinc-800 bg-[#111111] p-5"
+                    className="min-w-0 overflow-hidden rounded-xl border border-[#E5D9C8] bg-[#FAF4E8] p-5"
                   >
-                    <p className="text-sm font-semibold text-zinc-50">{scenario.label}</p>
+                    <p className="text-sm font-semibold text-stone-800">{scenario.label}</p>
 
                     <div className="mt-4 mb-1">
-                        <p className="text-xs text-zinc-500">You&apos;ll end up with</p>
+                        <p className="text-xs text-stone-500">You&apos;ll end up with</p>
                     </div>
-                    <p className={`${cardNumberFontSize(scenario.totalBalance)} text-zinc-50`}>
+                    <p className={`${cardNumberFontSize(scenario.totalBalance)} text-stone-800`}>
                         <MoneyDisplay value={scenario.totalBalance} />
                     </p>
 
-                    <hr className="my-4 border-zinc-800" />
+                    <hr className="my-4 border-[#E5D9C8]" />
 
                       {!scenario.highlight && scenario.missedAmount > 0 && (
                       <>
-                          <p className="text-xs text-zinc-500">Lost Returns</p>
-                        <p className={`mt-1 ${cardNumberFontSize(scenario.missedAmount)} text-red-400`}>
+                          <p className="text-xs text-stone-500">Lost Returns</p>
+                        <p className={`mt-1 ${cardNumberFontSize(scenario.missedAmount)} text-red-600`}>
                             <MoneyDisplay value={scenario.missedAmount} />
                         </p>
                       </>
@@ -1019,7 +1019,7 @@ export default function Home() {
               </div>
 
               {comparisonScenarios.length >= 3 && comparisonScenarios[2].missedAmount > 0 && (
-                <p className="text-sm text-zinc-400 mt-4 text-center">
+                <p className="text-sm text-stone-500 mt-4 text-center">
                   Starting today vs waiting 10 years could cost you{" "}
                   <MoneyDisplay value={comparisonScenarios[2].missedAmount} /> in lost returns.
                 </p>
@@ -1029,15 +1029,15 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <p className="pb-4 pt-8 text-center text-xs text-zinc-600">
+        <p className="pb-4 pt-8 text-center text-xs text-stone-400">
           Stackd is for educational purposes only. Not financial advice.
         </p>
-        <footer className="text-center pb-8 pt-2 space-x-3 text-xs text-zinc-600">
+        <footer className="text-center pb-8 pt-2 space-x-3 text-xs text-stone-400">
           <span>Built by Tawfic Shnoudeh</span>
           <span>·</span>
-          <a href="https://www.linkedin.com/in/tawficshnoudeh" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-400 transition-colors">LinkedIn</a>
+          <a href="https://www.linkedin.com/in/tawficshnoudeh" target="_blank" rel="noopener noreferrer" className="hover:text-stone-700 transition-colors">LinkedIn</a>
           <span>·</span>
-          <a href="https://tawficshnoudeh.com" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-400 transition-colors">tawficshnoudeh.com</a>
+          <a href="https://tawficshnoudeh.com" target="_blank" rel="noopener noreferrer" className="hover:text-stone-700 transition-colors">tawficshnoudeh.com</a>
         </footer>
       </div>
     </div>
